@@ -52,6 +52,10 @@
     <Reference Include="Lucene.Net.Contrib.SpellChecker">
       <HintPath>..\..\packages\RavenDB-Embedded.1.0.573\lib\net40\Lucene.Net.Contrib.SpellChecker.dll</HintPath>
     </Reference>
+    <Reference Include="Naif.Core, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Naif.Core.1.2.1\lib\Naif.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -98,13 +102,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Naif.Core\Naif.Core.csproj">
-      <Project>{92d29735-f300-4640-887c-b7ed827a1154}</Project>
-      <Name>Naif.Core</Name>
+    <ProjectReference Include="..\Naif.Data\Naif.Data.csproj">
+      <Project>{DA9A84CB-368E-489E-97D6-29345F3666BB}</Project>
+      <Name>Naif.Data</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

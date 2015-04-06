@@ -1,8 +1,8 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
@@ -14,8 +14,6 @@ namespace Naif.Data.ComponentModel
 {
     public static class Util
     {
-        #region Private Members
-
         private static TAttribute GetAttribute<TAttribute>(MemberInfo member) where TAttribute : class
         {
             return member.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(TAttribute)) as TAttribute;
@@ -27,10 +25,6 @@ namespace Naif.Data.ComponentModel
             return type.DeclaredProperties.SingleOrDefault(p => p.Name == propertyName);
             
         }
-
-        #endregion
-
-        #region Public Members
 
         public static TValue GetAttributeValue<TAttribute, TValue>(MemberInfo member, string argumentName, TValue defaultValue) where TAttribute : Attribute
         {
@@ -72,7 +66,5 @@ namespace Naif.Data.ComponentModel
         {
             return (GetAttribute<CacheableAttribute>(type) != null);
         }
-
-        #endregion
     }
 }

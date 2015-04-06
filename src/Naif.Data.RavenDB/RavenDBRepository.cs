@@ -1,17 +1,16 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
 using System;
 using System.Collections.Generic;
+using Naif.Core.Caching;
 using Naif.Core.Contracts;
 using Raven.Client;
-using Naif.Core.Data;
-using Naif.Core.Caching;
 
 namespace Naif.Data.RavenDB
 {

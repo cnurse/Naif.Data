@@ -9,8 +9,8 @@
     <ProjectGuid>{8EF28436-3C5C-4E82-A753-A4AF0E706B9D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Naif.Data.PetaPoco.Tests</RootNamespace>
-    <AssemblyName>Naif.Data.PetaPoco.Tests</AssemblyName>
+    <RootNamespace>Naif.Data.NPoco.Tests</RootNamespace>
+    <AssemblyName>Naif.Data.NPoco.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -40,12 +40,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Moq.4.1.1309.1617\lib\net40\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="Naif.Core, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Naif.Core.1.2.1\lib\Naif.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPoco, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NPoco.2.6.88\lib\net40\NPoco.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="PetaPoco">
-      <HintPath>..\..\Externals\PetaPoco\PetaPoco.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -61,8 +66,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PetaPocoDataContextTests.cs" />
-    <Compile Include="PetaPocoRepositoryTests.cs" />
+    <Compile Include="NPocoDataContextTests.cs" />
+    <Compile Include="NPocoRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,21 +77,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Naif.Core\Naif.Core.csproj">
-      <Project>{92d29735-f300-4640-887c-b7ed827a1154}</Project>
-      <Name>Naif.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Naif.Data.NPoco\Naif.Data.NPoco.csproj">
       <Project>{C2C6E08C-AD63-40BE-BE8A-3FE52A2CC64A}</Project>
-      <Name>Naif.Data.PetaPoco</Name>
+      <Name>Naif.Data.NPoco</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Naif.Data\Naif.Data.csproj">
+      <Project>{DA9A84CB-368E-489E-97D6-29345F3666BB}</Project>
+      <Name>Naif.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Naif.TestUtilities\Naif.TestUtilities.csproj">
       <Project>{E9E468D8-C526-48C7-AAE2-0CBDB687E840}</Project>
       <Name>Naif.TestUtilities</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

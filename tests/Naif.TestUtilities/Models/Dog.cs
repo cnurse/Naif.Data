@@ -1,4 +1,4 @@
-﻿using Naif.Core.ComponentModel;
+﻿using Naif.Data.ComponentModel;
 
 namespace Naif.TestUtilities.Models
 {

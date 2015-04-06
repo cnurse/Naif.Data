@@ -1,8 +1,8 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
@@ -25,8 +25,8 @@ namespace Naif.Data.RavenDB.Tests
     public class RavenDBRepositoryTests
     {
         private const string ConnectionStringName = "RavenDB";
-        private readonly string[] _dogAges = TestConstants.PETAPOCO_DogAges.Split(',');
-        private readonly string[] _dogNames = TestConstants.PETAPOCO_DogNames.Split(',');
+        private readonly string[] _dogAges = TestConstants.NPOCO_DogAges.Split(',');
+        private readonly string[] _dogNames = TestConstants.NPOCO_DogNames.Split(',');
 
         [SetUp]
         public void SetUp()
@@ -166,7 +166,7 @@ namespace Naif.Data.RavenDB.Tests
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
 
                 //Act
-                dog = repository.GetById(TestConstants.PETAPOCO_InvalidDogId);
+                dog = repository.GetById(TestConstants.NPOCO_InvalidDogId);
             }
 
             //Assert
@@ -187,13 +187,13 @@ namespace Naif.Data.RavenDB.Tests
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
 
                 //Act
-                dog = repository.GetById(TestConstants.PETAPOCO_ValidDogId);
+                dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
             }
 
             //Assert
             Thread.Sleep(5000);
-            Assert.AreEqual(TestConstants.PETAPOCO_ValidDogAge, dog.Age.ToString());
-            Assert.AreEqual(TestConstants.PETAPOCO_ValidDogName, dog.Name);
+            Assert.AreEqual(TestConstants.NPOCO_ValidDogAge, dog.Age.ToString());
+            Assert.AreEqual(TestConstants.NPOCO_ValidDogName, dog.Name);
         }
 
         #endregion
@@ -302,15 +302,15 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    Age = TestConstants.PETAPOCO_InsertDogAge,
-                    Name = TestConstants.PETAPOCO_InsertDogName
+                    Age = TestConstants.NPOCO_InsertDogAge,
+                    Name = TestConstants.NPOCO_InsertDogName
                 };
 
                 //Act
@@ -327,7 +327,7 @@ namespace Naif.Data.RavenDB.Tests
             {
                 actualCount = session.Query<Dog>().Count();
             }
-            Assert.AreEqual(TestConstants.PETAPOCO_RecordCount + 1, actualCount);
+            Assert.AreEqual(TestConstants.NPOCO_RecordCount + 1, actualCount);
         }
 
         [Test]
@@ -335,15 +335,15 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    Age = TestConstants.PETAPOCO_InsertDogAge,
-                    Name = TestConstants.PETAPOCO_InsertDogName
+                    Age = TestConstants.NPOCO_InsertDogAge,
+                    Name = TestConstants.NPOCO_InsertDogName
                 };
 
                 //Act
@@ -356,8 +356,8 @@ namespace Naif.Data.RavenDB.Tests
             //Assert
             Thread.Sleep(5000);
             Dog newDog = GetLastItemAdded();
-            Assert.AreEqual(TestConstants.PETAPOCO_InsertDogAge, newDog.Age);
-            Assert.AreEqual(TestConstants.PETAPOCO_InsertDogName, newDog.Name);
+            Assert.AreEqual(TestConstants.NPOCO_InsertDogAge, newDog.Age);
+            Assert.AreEqual(TestConstants.NPOCO_InsertDogName, newDog.Name);
         }
 
         #endregion
@@ -369,16 +369,16 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    ID = TestConstants.PETAPOCO_DeleteDogId,
-                    Age = TestConstants.PETAPOCO_DeleteDogAge,
-                    Name = TestConstants.PETAPOCO_DeleteDogName
+                    ID = TestConstants.NPOCO_DeleteDogId,
+                    Age = TestConstants.NPOCO_DeleteDogAge,
+                    Name = TestConstants.NPOCO_DeleteDogName
                 };
 
                 //Act
@@ -386,9 +386,9 @@ namespace Naif.Data.RavenDB.Tests
             }
 
             //Assert
-            //int actualCount = DataUtil.GetRecordCount(TestConstants.PETAPOCO_DatabaseName,
-            //    TestConstants.PETAPOCO_TableName);
-            //Assert.AreEqual(TestConstants.PETAPOCO_RecordCount - 1, actualCount);
+            //int actualCount = DataUtil.GetRecordCount(TestConstants.NPOCO_DatabaseName,
+            //    TestConstants.NPOCO_TableName);
+            //Assert.AreEqual(TestConstants.NPOCO_RecordCount - 1, actualCount);
             Assert.IsTrue(false);
         }
 
@@ -397,16 +397,16 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    ID = TestConstants.PETAPOCO_DeleteDogId,
-                    Age = TestConstants.PETAPOCO_DeleteDogAge,
-                    Name = TestConstants.PETAPOCO_DeleteDogName
+                    ID = TestConstants.NPOCO_DeleteDogId,
+                    Age = TestConstants.NPOCO_DeleteDogAge,
+                    Name = TestConstants.NPOCO_DeleteDogName
                 };
 
                 //Act
@@ -414,10 +414,10 @@ namespace Naif.Data.RavenDB.Tests
             }
 
             //Assert
-            //DataTable table = DataUtil.GetTable(TestConstants.PETAPOCO_DatabaseName, TestConstants.PETAPOCO_TableName);
+            //DataTable table = DataUtil.GetTable(TestConstants.NPOCO_DatabaseName, TestConstants.NPOCO_TableName);
             //foreach (DataRow row in table.Rows)
             //{
-            //    Assert.IsFalse((int)row["ID"] == TestConstants.PETAPOCO_DeleteDogId);
+            //    Assert.IsFalse((int)row["ID"] == TestConstants.NPOCO_DeleteDogId);
             //}
             Assert.IsTrue(false);
         }
@@ -427,16 +427,16 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    ID = TestConstants.PETAPOCO_DeleteDogId,
-                    Age = TestConstants.PETAPOCO_DeleteDogAge,
-                    Name = TestConstants.PETAPOCO_DeleteDogName
+                    ID = TestConstants.NPOCO_DeleteDogId,
+                    Age = TestConstants.NPOCO_DeleteDogAge,
+                    Name = TestConstants.NPOCO_DeleteDogName
                 };
 
                 //Act
@@ -444,9 +444,9 @@ namespace Naif.Data.RavenDB.Tests
             }
 
             //Assert
-            //int actualCount = DataUtil.GetRecordCount(TestConstants.PETAPOCO_DatabaseName,
-            //    TestConstants.PETAPOCO_TableName);
-            //Assert.AreEqual(TestConstants.PETAPOCO_RecordCount, actualCount);
+            //int actualCount = DataUtil.GetRecordCount(TestConstants.NPOCO_DatabaseName,
+            //    TestConstants.NPOCO_TableName);
+            //Assert.AreEqual(TestConstants.NPOCO_RecordCount, actualCount);
             Assert.IsTrue(false);
         }
 
@@ -459,16 +459,16 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    ID = TestConstants.PETAPOCO_UpdateDogId,
-                    Age = TestConstants.PETAPOCO_UpdateDogAge,
-                    Name = TestConstants.PETAPOCO_UpdateDogName
+                    ID = TestConstants.NPOCO_UpdateDogId,
+                    Age = TestConstants.NPOCO_UpdateDogAge,
+                    Name = TestConstants.NPOCO_UpdateDogName
                 };
 
                 //Act
@@ -476,9 +476,9 @@ namespace Naif.Data.RavenDB.Tests
             }
 
             //Assert
-            //int actualCount = DataUtil.GetRecordCount(TestConstants.PETAPOCO_DatabaseName,
-            //    TestConstants.PETAPOCO_TableName);
-            //Assert.AreEqual(TestConstants.PETAPOCO_RecordCount, actualCount);
+            //int actualCount = DataUtil.GetRecordCount(TestConstants.NPOCO_DatabaseName,
+            //    TestConstants.NPOCO_TableName);
+            //Assert.AreEqual(TestConstants.NPOCO_RecordCount, actualCount);
             Assert.IsTrue(false);
         }
 
@@ -487,16 +487,16 @@ namespace Naif.Data.RavenDB.Tests
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+            SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
             using (IDocumentSession ravenDB = RavenDBDocumentStore.Instance.OpenSession())
             {
                 var repository = new RavenDBRepository<Dog>(ravenDB, mockCache.Object);
                 var dog = new Dog
                 {
-                    ID = TestConstants.PETAPOCO_UpdateDogId,
-                    Age = TestConstants.PETAPOCO_UpdateDogAge,
-                    Name = TestConstants.PETAPOCO_UpdateDogName
+                    ID = TestConstants.NPOCO_UpdateDogId,
+                    Age = TestConstants.NPOCO_UpdateDogAge,
+                    Name = TestConstants.NPOCO_UpdateDogName
                 };
 
                 //Act
@@ -504,13 +504,13 @@ namespace Naif.Data.RavenDB.Tests
             }
 
             //Assert
-            //DataTable table = DataUtil.GetTable(TestConstants.PETAPOCO_DatabaseName, TestConstants.PETAPOCO_TableName);
+            //DataTable table = DataUtil.GetTable(TestConstants.NPOCO_DatabaseName, TestConstants.NPOCO_TableName);
             //foreach (DataRow row in table.Rows)
             //{
-            //    if ((int)row["ID"] == TestConstants.PETAPOCO_UpdateDogId)
+            //    if ((int)row["ID"] == TestConstants.NPOCO_UpdateDogId)
             //    {
-            //        Assert.AreEqual(row["Age"], TestConstants.PETAPOCO_UpdateDogAge);
-            //        Assert.AreEqual(row["Name"], TestConstants.PETAPOCO_UpdateDogName);
+            //        Assert.AreEqual(row["Age"], TestConstants.NPOCO_UpdateDogAge);
+            //        Assert.AreEqual(row["Name"], TestConstants.NPOCO_UpdateDogName);
             //    }
             //}
             Assert.IsTrue(false);

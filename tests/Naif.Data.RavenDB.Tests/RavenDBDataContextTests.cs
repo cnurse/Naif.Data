@@ -1,19 +1,18 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
 using System;
 using Moq;
-using NUnit.Framework;
 using Naif.Core.Caching;
-using Naif.Core.Data;
-using Raven.Client;
 using Naif.TestUtilities;
 using Naif.TestUtilities.Models;
+using NUnit.Framework;
+using Raven.Client;
 
 namespace Naif.Data.RavenDB.Tests
 {

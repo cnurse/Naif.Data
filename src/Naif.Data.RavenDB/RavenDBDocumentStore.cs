@@ -1,17 +1,16 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
 using System;
 using System.Reflection;
-
+using Naif.Data.ComponentModel;
 using Raven.Client;
 using Raven.Client.Embedded;
-using Naif.Core.ComponentModel;
 
 namespace Naif.Data.RavenDB
 {

@@ -1,28 +1,25 @@
 ﻿//******************************************
-//  Copyright (C) 2012-2013 Charles Nurse  *
+//  Copyright (C) 2014-2015 Charles Nurse  *
 //                                         *
 //  Licensed under MIT License             *
-//  (see included License.txt file)        *
+//  (see included LICENSE)                 *
 //                                         *
 // *****************************************
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Naif.Core.Caching;
 using Naif.Core.Contracts;
+using Naif.Data.ComponentModel;
 using NPoco;
+// ReSharper disable UseStringInterpolation
 
 namespace Naif.Data.NPoco
 {
     public class NPocoRepository<T> : RepositoryBase<T> where T : class
     {
-        #region Private Members
-
         private readonly Database _database;
-
-        #endregion
-
-        #region Constructors
 
         public NPocoRepository(Database database, ICacheProvider cache)
             : this(database, cache, new NPocoMapper(String.Empty))
@@ -36,13 +33,8 @@ namespace Naif.Data.NPoco
 
             _database = database;
 
-            if (Mappers.GetMapper(typeof(T)) is StandardMapper)
-            {
-                Mappers.Register(typeof(T), mapper);
-            }
+            _database.Mapper = mapper;
         }
-
-        #endregion
 
         protected override void AddInternal(T item)
         {
@@ -61,7 +53,7 @@ namespace Naif.Data.NPoco
 
         protected override T GetByIdInternal<TProperty>(TProperty id)
         {
-            return _database.SingleOrDefault<T>(id);
+            return _database.SingleOrDefault<T>(String.Format("WHERE {0} = @0", Util.GetPrimaryKeyName(typeof(T).GetTypeInfo())), id);
         }
 
         protected override IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue)
