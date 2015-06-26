@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Naif.Core.Caching;
-using Naif.Core.ComponentModel;
+using Naif.Core.Collections;
 using Naif.Core.Contracts;
 using Naif.Data.ComponentModel;
 
@@ -19,97 +19,121 @@ namespace Naif.Data
 {
     public abstract class RepositoryBase<T> : IRepository<T> where T : class
     {
-        #region Private Members
-
         private readonly ICacheProvider _cache;
-
-        #endregion
-
-        #region Constructors
 
         protected RepositoryBase(ICacheProvider cache)
         {
             Requires.NotNull("cache", cache);
 
             _cache = cache;
+
+            Initialize();
         }
 
-        #endregion
+        protected string CacheKey { get; private set; }
 
-        #region IRepository<T> Implementation
+        protected bool IsCacheable { get; private set; }
 
-        public IEnumerable<T> GetAll()
-        {
-            IEnumerable<T> items = IsCacheable 
-                                    ? _cache.GetCachedObject(CacheKey, GetAllInternal) 
-                                    : GetAllInternal();
-            return items;
-        }
+        protected bool IsScoped { get; private set; }
 
-        public T GetById<TProperty>(TProperty id)
-        {
-            T item = IsCacheable 
-                         ? GetAll().SingleOrDefault(t => CompareTo(GetPrimaryKey<TProperty>(t), id) == 0) 
-                         : GetByIdInternal(id);
-
-            return item;
-        }
-
-        public IEnumerable<T> GetByProperty<TProperty>(string propertyName, TProperty propertyValue)
-        {
-            IEnumerable<T> items = IsCacheable 
-                                    ? GetAll().Where(t => CompareTo(GetPropertyValue<TProperty>(t, propertyName), propertyValue) == 0) 
-                                    : GetByPropertyInternal(propertyName, propertyValue);
-
-            return items;
-        }
+        protected string Scope { get; private set; }
 
         public void Add(T item)
         {
             AddInternal(item);
-            ClearCache();
+            ClearCache(item);
         }
 
         public void Delete(T item)
         {
             DeleteInternal(item);
-            ClearCache();
+            ClearCache(item);
         }
 
+        public abstract IEnumerable<T> Find(string sqlCondition, params object[] args);
+
+        public abstract IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args);
+
+        public IEnumerable<T> Get<TScopeType>(TScopeType scopeValue)
+        {
+            CheckIfScoped();
+
+            if (IsCacheable)
+            {
+                CacheKey = String.Format(CacheKey, scopeValue);
+            }
+
+            return IsCacheable
+                ? _cache.GetCachedObject<IEnumerable<T>>(CacheKey, () => GetByScopeInternal(scopeValue))
+                : GetByScopeInternal(scopeValue);
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            IEnumerable<T> items = IsCacheable && !IsScoped
+                                    ? _cache.GetCachedObject(CacheKey, GetAllInternal)
+                                    : GetAllInternal();
+            return items;
+        }
+
+        //TODO Write Unit Tests
+        public T GetById<TProperty>(TProperty id)
+        {
+            T item = IsCacheable && !IsScoped
+                         ? GetAll().SingleOrDefault(t => CompareTo(GetPrimaryKey<TProperty>(t), id) == 0)
+                         : GetByIdInternal(id);
+
+            return item;
+        }
+
+        //TODO Write Unit Tests
+        public T GetById<TProperty, TScopeType>(TProperty id, TScopeType scopeValue)
+        {
+            CheckIfScoped();
+
+            return Get(scopeValue).SingleOrDefault(t => CompareTo(GetPrimaryKey<TProperty>(t), id) == 0);
+        }
+
+        //TODO Write Unit Tests
+        public IPagedList<T> GetPage(int pageIndex, int pageSize)
+        {
+            return IsCacheable && !IsScoped
+                ? GetAll().InPagesOf(pageSize).GetPage(pageIndex)
+                : GetPageInternal(pageIndex, pageSize);
+        }
+
+        //TODO Write Unit Tests
+        public IPagedList<T> GetPage<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize)
+        {
+            CheckIfScoped();
+
+            return IsCacheable
+                ? Get(scopeValue).InPagesOf(pageSize).GetPage(pageIndex)
+                : GetPageByScopeInternal(scopeValue, pageIndex, pageSize);
+        }
+
+        //TODO Write Unit Tests
         public void Update(T item)
         {
             UpdateInternal(item);
-            ClearCache();
+            ClearCache(item);
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private void ClearCache()
+        private void CheckIfScoped()
         {
-            if (IsCacheable)
+            if (!IsScoped)
             {
-                _cache.Remove(CacheKey);
+                throw new NotSupportedException("This method requires the model to be cacheable and have a cache scope defined");
             }
         }
 
-        private TProperty GetPropertyValue<TProperty>(TypeInfo modelType, T item, string propertyName)
-        { 
-            var property = modelType.DeclaredProperties.SingleOrDefault(p => p.Name == propertyName);
-
-            return (TProperty)property.GetValue(item, null);
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected string CacheKey
+        private void ClearCache(T item)
         {
-            get
+            if (IsCacheable)
             {
-                return Util.GetCacheKey(typeof(T).GetTypeInfo());
+                _cache.Remove(IsScoped
+                                ? String.Format(CacheKey, GetScopeValue<object>(item))
+                                : CacheKey);
             }
         }
 
@@ -126,11 +150,6 @@ namespace Naif.Data
 // ReSharper restore PossibleNullReferenceException
         }
 
-        protected TProperty GetPropertyValue<TProperty>(T item, string propertyName)
-        {
-            return GetPropertyValue<TProperty>(typeof(T).GetTypeInfo(), item, propertyName);
-        }
-
         protected TProperty GetPrimaryKey<TProperty>(T item)
         {
             TypeInfo modelType = typeof(T).GetTypeInfo();
@@ -141,17 +160,39 @@ namespace Naif.Data
             return GetPropertyValue<TProperty>(modelType, item, primaryKeyName);
         }
 
-        protected bool IsCacheable
+        private TProperty GetPropertyValue<TProperty>(TypeInfo modelType, T item, string propertyName)
         {
-            get
+            var property = modelType.DeclaredProperties.SingleOrDefault(p => p.Name == propertyName);
+
+            return (TProperty)property.GetValue(item, null);
+        }
+
+        protected TProperty GetPropertyValue<TProperty>(T item, string propertyName)
+        {
+            return GetPropertyValue<TProperty>(typeof(T).GetTypeInfo(), item, propertyName);
+        }
+
+        protected TProperty GetScopeValue<TProperty>(T item)
+        {
+            return GetPropertyValue<TProperty>(item, Scope);
+        }
+
+        private void Initialize()
+        {
+            var type = typeof (T);
+            var typeInfo = type.GetTypeInfo();
+
+            Scope = Util.GetScope(type.GetTypeInfo());
+            IsScoped = (!String.IsNullOrEmpty(Scope));
+
+            IsCacheable = Util.IsCacheable(typeInfo);
+            CacheKey = Util.GetCacheKey(typeInfo);
+            if (IsScoped)
             {
-                return Util.IsCacheable(typeof(T).GetTypeInfo());
+                CacheKey += "_" + Scope + "_{0}";
             }
         }
 
-        #endregion
-
-        #region Abstract Methods
 
         protected abstract void AddInternal(T item);
 
@@ -159,12 +200,28 @@ namespace Naif.Data
 
         protected abstract IEnumerable<T> GetAllInternal();
 
-        protected abstract T GetByIdInternal<TProperty>(TProperty id);
+        protected abstract T GetByIdInternal(object id);
 
         protected abstract IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue);
 
+        //TODO Write Unit Tests
+        protected abstract IEnumerable<T> GetByScopeInternal(object propertyValue);
+
+        //TODO Write Unit Tests
+        protected abstract IPagedList<T> GetPageInternal(int pageIndex, int pageSize);
+
+        //TODO Write Unit Tests
+        protected abstract IPagedList<T> GetPageByScopeInternal(object propertyValue, int pageIndex, int pageSize);
+
         protected abstract void UpdateInternal(T item);
 
-        #endregion
+        [ObsoleteAttribute("Deprecated in version 1.2.0. Use one of the Find methods which provide more flexibility")]
+        public IEnumerable<T> GetByProperty<TProperty>(string propertyName, TProperty propertyValue)
+        {
+            IEnumerable<T> items = IsCacheable && !IsScoped
+                                    ? GetAll().Where(t => CompareTo(GetPropertyValue<TProperty>(t, propertyName), propertyValue) == 0)
+                                    : GetByPropertyInternal(propertyName, propertyValue);
+            return items;
+        }
     }
 }

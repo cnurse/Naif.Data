@@ -10,8 +10,9 @@ using Naif.Data.ComponentModel;
 
 namespace Naif.TestUtilities.Models
 {
-    [PrimaryKey(KeyField = "ID")]
-    public class Dog
+    [Cacheable(TestConstants.CACHE_DogsKey)]
+    [Scope(TestConstants.CACHE_ScopeAll)]
+    public class CacheableDog
     {
         public int? Age { get; set; }
         public int ID { get; set; }

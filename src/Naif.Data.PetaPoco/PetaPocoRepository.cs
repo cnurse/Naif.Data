@@ -8,33 +8,33 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Naif.Core.Caching;
 using Naif.Core.Collections;
 using Naif.Core.Contracts;
-using Naif.Data.ComponentModel;
-using NPoco;
-// ReSharper disable UseStringInterpolation
+using PetaPoco;
 
-namespace Naif.Data.NPoco
+namespace Naif.Data.PetaPoco
 {
-    public class NPocoRepository<T> : RepositoryBase<T> where T : class
+    public class PetaPocoRepository<T> : RepositoryBase<T> where T : class
     {
         private readonly Database _database;
 
-        public NPocoRepository(Database database, ICacheProvider cache)
-            : this(database, cache, new NPocoMapper(String.Empty))
+        public PetaPocoRepository(Database database, ICacheProvider cache)
+            : this(database, cache, new PetaPocoMapper(String.Empty))
         {
         }
 
-        public NPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
+        public PetaPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
             : base(cache)
         {
             Requires.NotNull("database", database);
 
             _database = database;
 
-            _database.Mapper = mapper;
+            if (Mappers.GetMapper(typeof(T)) is StandardMapper)
+            {
+                Mappers.Register(typeof(T), mapper);
+            }
         }
 
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
@@ -64,7 +64,7 @@ namespace Naif.Data.NPoco
 
         protected override T GetByIdInternal<TProperty>(TProperty id)
         {
-            return _database.SingleOrDefault<T>(String.Format("WHERE {0} = @0", Util.GetPrimaryKeyName(typeof(T).GetTypeInfo())), id);
+            return _database.SingleOrDefault<T>(id);
         }
 
         protected override IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue)

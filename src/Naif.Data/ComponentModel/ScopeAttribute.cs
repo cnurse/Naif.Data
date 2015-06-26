@@ -8,21 +8,18 @@
 
 using System;
 
-namespace Naif.TestUtilities.Models
+namespace Naif.Data.ComponentModel
 {
-    public class Person //: IIdentifiable
+    public class ScopeAttribute : Attribute
     {
-        public virtual int Id { get; set; }
-
-        public virtual string Name { get; set; }
-        public virtual DateTime Birthdate { get; set; }
-
-        public bool IsNew
+        public ScopeAttribute(string scope)
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            Scope = scope;
         }
+
+        /// <summary>
+        /// The property to use to scope the cache.  The default is an empty string.
+        /// </summary>
+        public string Scope { get; set; }
     }
 }

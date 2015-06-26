@@ -10,11 +10,11 @@ using Naif.Data.ComponentModel;
 
 namespace Naif.TestUtilities.Models
 {
-    [PrimaryKey(KeyField = "ID")]
-    public class Dog
+    [Scope(TestConstants.CACHE_ScopeModule)]
+    public class Cat
     {
         public int? Age { get; set; }
-        public int ID { get; set; }
+        public int ModuleId { get; set; }
         public string Name { get; set; }
     }
 }

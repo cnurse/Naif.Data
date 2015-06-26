@@ -41,8 +41,6 @@ namespace Naif.Data.NPoco.Tests
             DataUtil.DeleteDatabase(TestConstants.NPOCO_DatabaseName);
         }
 
-        #region Constructor Tests
-
         [Test]
         public void NPocoRepository_Constructor_Throws_On_Null_ICacheProvider()
         {
@@ -62,203 +60,6 @@ namespace Naif.Data.NPoco.Tests
             //Act, Assert
             Assert.Throws<ArgumentNullException>(() => new NPocoRepository<Dog>(null, mockCache.Object));
         }
-
-        #endregion
-
-        #region GetAll Tests
-
-        [Test]
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(5)]
-        public void NPocoRepository_GetAll_Returns_All_Rows(int count)
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(count);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            IEnumerable<Dog> dogs = repository.GetAll();
-
-            //Assert
-            Assert.AreEqual(count, dogs.Count());
-        }
-
-        [Test]
-        public void NPocoRepository_GetAll_Returns_List_Of_Models()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dogs = repository.GetAll().ToList();
-
-            //Assert
-            for (int i = 0; i < dogs.Count(); i++)
-            {
-                Assert.IsInstanceOf<Dog>(dogs[i]);
-            }
-        }
-
-        [Test]
-        public void NPocoRepository_GetAll_Returns_Models_With_Correct_Properties()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dogs = repository.GetAll();
-
-            //Assert
-            var dog = dogs.First();
-            Assert.AreEqual(_dogAges[0], dog.Age.ToString());
-            Assert.AreEqual(_dogNames[0], dog.Name);
-        }
-
-        #endregion
-
-        #region GetById Tests
-
-        [Test]
-        public void NPocoRepository_GetById_Returns_Instance_Of_Model_If_Valid_Id()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
-
-            //Assert
-            Assert.IsInstanceOf<Dog>(dog);
-        }
-
-        [Test]
-        public void NPocoRepository_GetById_Returns_Null_If_InValid_Id()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dog = repository.GetById(TestConstants.NPOCO_InvalidDogId);
-
-            //Assert
-            Assert.IsNull(dog);
-        }
-
-        [Test]
-        public void NPocoRepository_GetById_Returns_Model_With_Correct_Properties()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
-
-            //Assert
-            Assert.AreEqual(TestConstants.NPOCO_ValidDogAge, dog.Age);
-            Assert.AreEqual(TestConstants.NPOCO_ValidDogName, dog.Name);
-        }
-
-        #endregion
-
-        #region GetByProperty Tests
-
-        [Test]
-        [TestCase("Spot", 2)]
-        [TestCase("Buddy", 1)]
-        public void NPocoRepository_GetByProperty_Returns_List_Of_Models_If_Valid_Property(string dogName, int count)
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dogs = repository.GetByProperty("Name", dogName);
-
-            //Assert
-            Assert.IsInstanceOf<IEnumerable<Dog>>(dogs);
-            Assert.AreEqual(count, dogs.Count());
-        }
-
-        [Test]
-        public void NPocoRepository_GetByProperty_Returns_Instance_Of_Model_If_Valid_Property()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-            var dogName = _dogNames[2];
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dog = repository.GetByProperty("Name", dogName).FirstOrDefault();
-
-            //Assert
-            Assert.IsInstanceOf<Dog>(dog);
-        }
-
-        [Test]
-        public void NPocoRepository_GetByProperty_Returns_Empty_List_If_InValid_Proeprty()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-            const string dogName = "Invalid";
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dogs = repository.GetByProperty("Name", dogName);
-
-            //Assert
-            Assert.IsInstanceOf<IEnumerable<Dog>>(dogs);
-            Assert.AreEqual(0, dogs.Count());
-        }
-
-        [Test]
-        [TestCase("Spot")]
-        [TestCase("Buddy")]
-        public void NPocoRepository_GetByProperty_Returns_Models_With_Correct_Properties(string dogName)
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
-
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
-
-            //Act
-            var dogs = repository.GetByProperty("Name", dogName);
-
-            //Assert
-            foreach (Dog dog in dogs)
-            {
-                Assert.AreEqual(dogName, dog.Name);
-            }
-        }
-
-
-        #endregion
-
-        #region Add Tests
 
         [Test]
         public void NPocoRepository_Add_Inserts_Item_Into_DataBase()
@@ -330,10 +131,6 @@ namespace Naif.Data.NPoco.Tests
             Assert.AreEqual(TestConstants.NPOCO_InsertDogAge, row["Age"]);
             Assert.AreEqual(TestConstants.NPOCO_InsertDogName, row["Name"]);
         }
-
-        #endregion
-
-        #region Delete Tests
 
         [Test]
         public void NPocoRepository_Delete_Deletes_Item_From_DataBase()
@@ -410,9 +207,185 @@ namespace Naif.Data.NPoco.Tests
             Assert.AreEqual(TestConstants.NPOCO_RecordCount, actualCount);
         }
 
-        #endregion
+        [Test]
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(5)]
+        public void NPocoRepository_GetAll_Returns_All_Rows(int count)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(count);
 
-        #region Update Tests
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            IEnumerable<Dog> dogs = repository.GetAll();
+
+            //Assert
+            Assert.AreEqual(count, dogs.Count());
+        }
+
+        [Test]
+        public void NPocoRepository_GetAll_Returns_List_Of_Models()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetAll().ToList();
+
+            //Assert
+            for (int i = 0; i < dogs.Count(); i++)
+            {
+                Assert.IsInstanceOf<Dog>(dogs[i]);
+            }
+        }
+
+        [Test]
+        public void NPocoRepository_GetAll_Returns_Models_With_Correct_Properties()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetAll();
+
+            //Assert
+            var dog = dogs.First();
+            Assert.AreEqual(_dogAges[0], dog.Age.ToString());
+            Assert.AreEqual(_dogNames[0], dog.Name);
+        }
+
+        [Test]
+        public void NPocoRepository_GetById_Returns_Instance_Of_Model_If_Valid_Id()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
+
+            //Assert
+            Assert.IsInstanceOf<Dog>(dog);
+        }
+
+        [Test]
+        public void NPocoRepository_GetById_Returns_Null_If_InValid_Id()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dog = repository.GetById(TestConstants.NPOCO_InvalidDogId);
+
+            //Assert
+            Assert.IsNull(dog);
+        }
+
+        [Test]
+        public void NPocoRepository_GetById_Returns_Model_With_Correct_Properties()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
+
+            //Assert
+            Assert.AreEqual(TestConstants.NPOCO_ValidDogAge, dog.Age);
+            Assert.AreEqual(TestConstants.NPOCO_ValidDogName, dog.Name);
+        }
+
+        [Test]
+        [TestCase("Spot", 2)]
+        [TestCase("Buddy", 1)]
+        public void NPocoRepository_GetByProperty_Returns_List_Of_Models_If_Valid_Property(string dogName, int count)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetByProperty("Name", dogName);
+
+            //Assert
+            Assert.IsInstanceOf<IEnumerable<Dog>>(dogs);
+            Assert.AreEqual(count, dogs.Count());
+        }
+
+        [Test]
+        public void NPocoRepository_GetByProperty_Returns_Instance_Of_Model_If_Valid_Property()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+            var dogName = _dogNames[2];
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dog = repository.GetByProperty("Name", dogName).FirstOrDefault();
+
+            //Assert
+            Assert.IsInstanceOf<Dog>(dog);
+        }
+
+        [Test]
+        public void NPocoRepository_GetByProperty_Returns_Empty_List_If_InValid_Proeprty()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+            const string dogName = "Invalid";
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetByProperty("Name", dogName);
+
+            //Assert
+            Assert.IsInstanceOf<IEnumerable<Dog>>(dogs);
+            Assert.AreEqual(0, dogs.Count());
+        }
+
+        [Test]
+        [TestCase("Spot")]
+        [TestCase("Buddy")]
+        public void NPocoRepository_GetByProperty_Returns_Models_With_Correct_Properties(string dogName)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(5);
+
+            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetByProperty("Name", dogName);
+
+            //Assert
+            foreach (Dog dog in dogs)
+            {
+                Assert.AreEqual(dogName, dog.Name);
+            }
+        }
 
         [Test]
         public void NPocoRepository_Update_Updates_Item_In_DataBase()
@@ -467,8 +440,6 @@ namespace Naif.Data.NPoco.Tests
                 }
             }
         }
-
-        #endregion
 
         private Database CreatePecaPocoDatabase()
         {

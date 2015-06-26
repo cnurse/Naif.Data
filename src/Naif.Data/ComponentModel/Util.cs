@@ -46,7 +46,7 @@ namespace Naif.Data.ComponentModel
             var cacheKey = String.Empty;
             if (IsCacheable(type))
             {
-                cacheKey = GetAttributeValue<CacheableAttribute, string>(type, "CacheKey", String.Format("OR_{0}", type.Name));
+                cacheKey = GetAttributeValue<CacheableAttribute, string>(type, "CacheKey", String.Format("NAIF_{0}", type.Name));
             }
 
             return cacheKey;
@@ -54,7 +54,12 @@ namespace Naif.Data.ComponentModel
 
         public static string GetPrimaryKeyName(TypeInfo type)
         {
-            return GetAttributeValue<TableNameAttribute, string>(type, "KeyField", String.Empty);
+            return GetAttributeValue<PrimaryKeyAttribute, string>(type, "KeyField", String.Empty);
+        }
+
+        public static string GetScope(TypeInfo type)
+        {
+            return GetAttributeValue<ScopeAttribute, string>(type, "Scope", String.Empty);
         }
 
         public static string GetTableName(TypeInfo type, string defaultName)
@@ -65,6 +70,11 @@ namespace Naif.Data.ComponentModel
         public static bool IsCacheable(TypeInfo type)
         {
             return (GetAttribute<CacheableAttribute>(type) != null);
+        }
+
+        public static bool IsScoped(TypeInfo type)
+        {
+            return (GetAttribute<ScopeAttribute>(type) != null);
         }
     }
 }

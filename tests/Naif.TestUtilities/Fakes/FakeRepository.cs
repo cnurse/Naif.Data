@@ -6,90 +6,72 @@
 //                                         *
 // *****************************************
 
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Naif.Core.Caching;
 using Naif.Core.Collections;
-using Naif.Core.Contracts;
-using Naif.Data.ComponentModel;
-using NPoco;
-// ReSharper disable UseStringInterpolation
+using Naif.Data;
 
-namespace Naif.Data.NPoco
+namespace Naif.TestUtilities.Fakes
 {
-    public class NPocoRepository<T> : RepositoryBase<T> where T : class
+    public class FakeRepository<T> : RepositoryBase<T> where T : class
     {
-        private readonly Database _database;
-
-        public NPocoRepository(Database database, ICacheProvider cache)
-            : this(database, cache, new NPocoMapper(String.Empty))
+        public FakeRepository(ICacheProvider cache) : base(cache)
         {
-        }
-
-        public NPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
-            : base(cache)
-        {
-            Requires.NotNull("database", database);
-
-            _database = database;
-
-            _database.Mapper = mapper;
         }
 
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         public override IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         protected override void AddInternal(T item)
         {
-            _database.Insert(item);
+            throw new System.NotImplementedException();
         }
 
         protected override void DeleteInternal(T item)
         {
-            _database.Delete(item);
+            throw new System.NotImplementedException();
         }
 
         protected override IEnumerable<T> GetAllInternal()
         {
-            return _database.Fetch<T>("");
+            throw new System.NotImplementedException();
         }
 
-        protected override T GetByIdInternal<TProperty>(TProperty id)
+        protected override T GetByIdInternal(object id)
         {
-            return _database.SingleOrDefault<T>(String.Format("WHERE {0} = @0", Util.GetPrimaryKeyName(typeof(T).GetTypeInfo())), id);
+            throw new System.NotImplementedException();
         }
 
         protected override IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue)
         {
-            return _database.Query<T>(String.Format("WHERE {0} = @0", propertyName), propertyValue);
+            throw new System.NotImplementedException();
         }
 
         protected override IEnumerable<T> GetByScopeInternal(object propertyValue)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         protected override IPagedList<T> GetPageInternal(int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         protected override IPagedList<T> GetPageByScopeInternal(object propertyValue, int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         protected override void UpdateInternal(T item)
         {
-            _database.Update(item);
+            throw new System.NotImplementedException();
         }
     }
 }

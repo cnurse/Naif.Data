@@ -8,23 +8,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Naif.Core.Collections;
 
 namespace Naif.Data
 {
-    public interface IRepository<T> where T : class
+    public interface ILinqRepository<T>
     {
-        /// <summary>
-        /// Add an Item into the repository
-        /// </summary>
-        /// <param name="item">The item to be added</param>
-        void Add(T item);
-
         /// <summary>
         /// Delete an Item from the repository
         /// </summary>
         /// <param name="item">The item to be deleted</param>
         void Delete(T item);
+
+        /// <summary>
+        /// Delete items from the repository based on a sql Condition
+        /// </summary>
+        /// <param name="sqlCondition">The sql condition e.g. "WHERE ArticleId = {0}"</param>
+        /// <param name="args">A collection of arguments to be mapped to the tokens in the sqlCondition</param>
+        void Delete(string sqlCondition, params object[] args);
 
         /// <summary>
         /// Find items from the repository based on a sql condition
@@ -50,6 +53,12 @@ namespace Naif.Data
         IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args);
 
         /// <summary>
+        /// Returns all the items in the repository as an enumerable list
+        /// </summary>
+        /// <returns>The list of items</returns>
+        IEnumerable<T> Get();
+
+        /// <summary>
         /// Returns an enumerable list of items filtered by scope
         /// </summary>
         /// <remarks>
@@ -61,12 +70,6 @@ namespace Naif.Data
         /// <param name="scopeValue">The value of the scope to filter by</param>
         /// <returns>The list of items</returns>
         IEnumerable<T> Get<TScopeType>(TScopeType scopeValue);
-
-        /// <summary>
-        /// Returns all the items in the repository as an enumerable list
-        /// </summary>
-        /// <returns>The list of items</returns>
-        IEnumerable<T> GetAll();
 
         /// <summary>
         /// Get an individual item based on the items Id field
@@ -115,12 +118,23 @@ namespace Naif.Data
         IPagedList<T> GetPage<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize);
 
         /// <summary>
+        /// Inserts an Item into the repository
+        /// </summary>
+        /// <param name="item">The item to be inserted</param>
+        void Insert(T item);
+
+        /// <summary>
         /// Updates an Item in the repository
         /// </summary>
         /// <param name="item">The item to be updated</param>
         void Update(T item);
 
-        [ObsoleteAttribute("Deprecated in version 1.2.0. Use one of the Find methods which provide more flexibility")]
-        IEnumerable<T> GetByProperty<TProperty>(string propertyName, TProperty propertyValue);
+        /// <summary>
+        /// Update items in the repository based on a sql Condition
+        /// </summary>
+        /// <param name="sqlCondition">The sql condition e.g. "SET ArticelName = @1 WHERE ArticleId = @0"</param>
+        /// <param name="args">A collection of arguments to be mapped to the tokens in the sqlCondition</param>
+        /// <example>Update("SET Age=@1, Name=@2 WHERE ID=@0", 1, 21, "scooby");</example>
+        void Update(string sqlCondition, params object[] args);
     }
 }

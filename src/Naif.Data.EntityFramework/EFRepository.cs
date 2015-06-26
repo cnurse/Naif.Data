@@ -8,33 +8,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Data.Entity;
 using Naif.Core.Caching;
 using Naif.Core.Collections;
 using Naif.Core.Contracts;
-using Naif.Data.ComponentModel;
-using NPoco;
-// ReSharper disable UseStringInterpolation
 
-namespace Naif.Data.NPoco
+namespace Naif.Data.EntityFramework
 {
-    public class NPocoRepository<T> : RepositoryBase<T> where T : class
+    public class EFRepository<T> : RepositoryBase<T> where T : class
     {
-        private readonly Database _database;
+        private readonly NaifDbContext _context;
+        private readonly IDbSet<T> _dbSet;
 
-        public NPocoRepository(Database database, ICacheProvider cache)
-            : this(database, cache, new NPocoMapper(String.Empty))
-        {
-        }
-
-        public NPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
+        public EFRepository(NaifDbContext context, ICacheProvider cache)
             : base(cache)
         {
-            Requires.NotNull("database", database);
+            Requires.NotNull("context", context);
+            Requires.NotNull("cache", cache);
 
-            _database = database;
-
-            _database.Mapper = mapper;
+            _context = context;
+            _dbSet = _context.Set<T>();
         }
 
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
@@ -49,27 +42,33 @@ namespace Naif.Data.NPoco
 
         protected override void AddInternal(T item)
         {
-            _database.Insert(item);
+            _dbSet.Add(item);
+            _context.SaveChanges();
         }
 
         protected override void DeleteInternal(T item)
         {
-            _database.Delete(item);
+            if (_context.Entry(item).State == EntityState.Detached)
+            {
+                _dbSet.Attach(item);
+            }
+            _dbSet.Remove(item);
+            _context.SaveChanges();
         }
 
         protected override IEnumerable<T> GetAllInternal()
         {
-            return _database.Fetch<T>("");
+            return _dbSet;
         }
 
         protected override T GetByIdInternal<TProperty>(TProperty id)
         {
-            return _database.SingleOrDefault<T>(String.Format("WHERE {0} = @0", Util.GetPrimaryKeyName(typeof(T).GetTypeInfo())), id);
+            throw new NotImplementedException();
         }
 
         protected override IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue)
         {
-            return _database.Query<T>(String.Format("WHERE {0} = @0", propertyName), propertyValue);
+            throw new NotImplementedException();
         }
 
         protected override IEnumerable<T> GetByScopeInternal(object propertyValue)
@@ -89,7 +88,9 @@ namespace Naif.Data.NPoco
 
         protected override void UpdateInternal(T item)
         {
-            _database.Update(item);
+            _dbSet.Attach(item);
+            _context.Entry(item).State = EntityState.Modified;
+            _context.SaveChanges();
         }
     }
 }

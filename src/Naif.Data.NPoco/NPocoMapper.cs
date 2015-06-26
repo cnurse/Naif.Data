@@ -24,8 +24,6 @@ namespace Naif.Data.NPoco
 
         public void GetTableInfo(Type t, TableInfo ti)
         {
-            ti = TableInfo.FromPoco(t);
-
             //Table Name
             ti.TableName = Util.GetAttributeValue<ComponentModel.TableNameAttribute, string>(t, "TableName", ti.TableName + "s");
 
