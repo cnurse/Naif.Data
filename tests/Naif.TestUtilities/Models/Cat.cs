@@ -14,6 +14,7 @@ namespace Naif.TestUtilities.Models
     public class Cat
     {
         public int? Age { get; set; }
+        public int ID { get; set; }
         public int ModuleId { get; set; }
         public string Name { get; set; }
     }

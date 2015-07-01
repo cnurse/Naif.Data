@@ -10,14 +10,10 @@ using System;
 
 namespace Naif.Data
 {
-    public interface IDataContext : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
-        IRepository<T> GetRepository<T>() where T : class;
-
-        void BeginTransaction();
-
         void Commit();
 
-        void RollbackTransaction();
+        bool SupportsLinq { get; }
     }
 }

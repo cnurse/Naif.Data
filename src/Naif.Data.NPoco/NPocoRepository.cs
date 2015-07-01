@@ -22,29 +22,33 @@ namespace Naif.Data.NPoco
     {
         private readonly Database _database;
 
-        public NPocoRepository(Database database, ICacheProvider cache)
-            : this(database, cache, new NPocoMapper(String.Empty))
+        public NPocoRepository(IUnitOfWork unitOfWork, ICacheProvider cache) : base(cache)
         {
-        }
+            Requires.NotNull("unitOfWork", unitOfWork);
 
-        public NPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
-            : base(cache)
-        {
-            Requires.NotNull("database", database);
-
-            _database = database;
-
-            _database.Mapper = mapper;
+            var nPocoUnitOfWork = unitOfWork as NPocoUnitOfWork;
+            if (nPocoUnitOfWork == null)
+            {
+                throw new Exception("Must be NPocoUnitOfWork"); // TODO: Typed exception
+            }
+            _database = nPocoUnitOfWork.Database;
         }
 
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            return _database.Fetch<T>(sqlCondition, args);
         }
 
         public override IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            //Make sure that the sql Condition contains an ORDER BY Clause
+            if (!sqlCondition.ToUpperInvariant().Contains("ORDER BY"))
+            {
+                sqlCondition = String.Format("{0} ORDER BY {1}", sqlCondition, Util.GetPrimaryKeyName(typeof(T).GetTypeInfo()));
+            }
+            Page<T> petaPocoPage = _database.Page<T>(pageIndex + 1, pageSize, sqlCondition, args);
+
+            return new PagedList<T>(petaPocoPage.Items, (int)petaPocoPage.TotalItems, pageIndex, pageSize);
         }
 
         protected override void AddInternal(T item)
@@ -62,7 +66,7 @@ namespace Naif.Data.NPoco
             return _database.Fetch<T>("");
         }
 
-        protected override T GetByIdInternal<TProperty>(TProperty id)
+        protected override T GetByIdInternal(object id)
         {
             return _database.SingleOrDefault<T>(String.Format("WHERE {0} = @0", Util.GetPrimaryKeyName(typeof(T).GetTypeInfo())), id);
         }
@@ -74,17 +78,22 @@ namespace Naif.Data.NPoco
 
         protected override IEnumerable<T> GetByScopeInternal(object propertyValue)
         {
-            throw new NotImplementedException();
+            return _database.Fetch<T>(GetScopeSql(), propertyValue);
         }
 
         protected override IPagedList<T> GetPageInternal(int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            return Find(pageIndex, pageSize, String.Empty);
         }
 
         protected override IPagedList<T> GetPageByScopeInternal(object propertyValue, int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            return Find(pageIndex, pageSize, GetScopeSql(), propertyValue);
+        }
+
+        private string GetScopeSql()
+        {
+            return String.Format("WHERE {0} = @0", Util.GetColumnName(typeof(T).GetTypeInfo(), Scope));
         }
 
         protected override void UpdateInternal(T item)

@@ -76,7 +76,6 @@ namespace Naif.Data
             return items;
         }
 
-        //TODO Write Unit Tests
         public T GetById<TProperty>(TProperty id)
         {
             T item = IsCacheable && !IsScoped
@@ -86,7 +85,6 @@ namespace Naif.Data
             return item;
         }
 
-        //TODO Write Unit Tests
         public T GetById<TProperty, TScopeType>(TProperty id, TScopeType scopeValue)
         {
             CheckIfScoped();
@@ -94,7 +92,6 @@ namespace Naif.Data
             return Get(scopeValue).SingleOrDefault(t => CompareTo(GetPrimaryKey<TProperty>(t), id) == 0);
         }
 
-        //TODO Write Unit Tests
         public IPagedList<T> GetPage(int pageIndex, int pageSize)
         {
             return IsCacheable && !IsScoped
@@ -102,7 +99,6 @@ namespace Naif.Data
                 : GetPageInternal(pageIndex, pageSize);
         }
 
-        //TODO Write Unit Tests
         public IPagedList<T> GetPage<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize)
         {
             CheckIfScoped();
@@ -112,7 +108,6 @@ namespace Naif.Data
                 : GetPageByScopeInternal(scopeValue, pageIndex, pageSize);
         }
 
-        //TODO Write Unit Tests
         public void Update(T item)
         {
             UpdateInternal(item);
@@ -193,7 +188,6 @@ namespace Naif.Data
             }
         }
 
-
         protected abstract void AddInternal(T item);
 
         protected abstract void DeleteInternal(T item);
@@ -204,13 +198,10 @@ namespace Naif.Data
 
         protected abstract IEnumerable<T> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue);
 
-        //TODO Write Unit Tests
         protected abstract IEnumerable<T> GetByScopeInternal(object propertyValue);
 
-        //TODO Write Unit Tests
         protected abstract IPagedList<T> GetPageInternal(int pageIndex, int pageSize);
 
-        //TODO Write Unit Tests
         protected abstract IPagedList<T> GetPageByScopeInternal(object propertyValue, int pageIndex, int pageSize);
 
         protected abstract void UpdateInternal(T item);

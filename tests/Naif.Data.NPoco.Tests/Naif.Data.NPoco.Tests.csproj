@@ -66,7 +66,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NPocoDataContextTests.cs" />
+    <Compile Include="NPocoUnitOfWorkTests.cs" />
     <Compile Include="NPocoRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -65,7 +65,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PetaPocoDataContextTests.cs" />
+    <Compile Include="PetaPocoUnitOfWorkTests.cs" />
     <Compile Include="PetaPocoRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

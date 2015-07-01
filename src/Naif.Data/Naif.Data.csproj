@@ -37,7 +37,7 @@
     <Compile Include="ComponentModel\CacheableAttribute.cs" />
     <Compile Include="ComponentModel\ColumnNameAttribute.cs" />
     <Compile Include="ComponentModel\ScopeAttribute.cs" />
-    <Compile Include="IDataContext.cs" />
+    <Compile Include="IUnitOfWork.cs" />
     <Compile Include="ILinqRepository.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="ComponentModel\PrimaryKeyAttribute.cs" />

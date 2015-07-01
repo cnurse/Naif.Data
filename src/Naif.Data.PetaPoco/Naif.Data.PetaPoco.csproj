@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PetaPocoDataContext.cs" />
+    <Compile Include="PetaPocoUnitOfWork.cs" />
     <Compile Include="PetaPocoMapper.cs" />
     <Compile Include="PetaPocoRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

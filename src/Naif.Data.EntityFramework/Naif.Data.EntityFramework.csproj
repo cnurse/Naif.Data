@@ -58,8 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EFDataContext.cs" />
-    <Compile Include="EFRepository.cs" />
+    <Compile Include="EFUnitOfWork.cs" />
+    <Compile Include="EFLinqRepository.cs" />
     <Compile Include="NaifDbContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

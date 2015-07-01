@@ -52,6 +52,25 @@ namespace Naif.Data.ComponentModel
             return cacheKey;
         }
 
+        public static string GetColumnName(TypeInfo type, string propertyName)
+        {
+            return GetColumnName(type.GetDeclaredProperty(propertyName), propertyName);
+        }
+
+        public static string GetColumnName(PropertyInfo propertyInfo, string defaultName)
+        {
+            var columnName = defaultName;
+
+            var columnNameAttributes = propertyInfo.GetCustomAttributes(typeof(ColumnNameAttribute), true).ToList();
+            if (columnNameAttributes.Count > 0)
+            {
+                var columnNameAttribute = (ColumnNameAttribute)columnNameAttributes[0];
+                columnName = columnNameAttribute.ColumnName;
+            }
+
+            return columnName;
+        }
+
         public static string GetPrimaryKeyName(TypeInfo type)
         {
             return GetAttributeValue<PrimaryKeyAttribute, string>(type, "KeyField", String.Empty);

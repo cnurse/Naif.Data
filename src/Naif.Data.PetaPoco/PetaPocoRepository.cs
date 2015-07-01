@@ -8,9 +8,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Naif.Core.Caching;
 using Naif.Core.Collections;
 using Naif.Core.Contracts;
+using Naif.Data.ComponentModel;
 using PetaPoco;
 
 namespace Naif.Data.PetaPoco
@@ -19,32 +21,40 @@ namespace Naif.Data.PetaPoco
     {
         private readonly Database _database;
 
-        public PetaPocoRepository(Database database, ICacheProvider cache)
-            : this(database, cache, new PetaPocoMapper(String.Empty))
+        public PetaPocoRepository(IUnitOfWork unitOfWork, ICacheProvider cache) : base(cache)
         {
-        }
+            Requires.NotNull("unitOfWork", unitOfWork);
 
-        public PetaPocoRepository(Database database, ICacheProvider cache, IMapper mapper)
-            : base(cache)
-        {
-            Requires.NotNull("database", database);
+            var petaPocoUnitOfWork = unitOfWork as PetaPocoUnitOfWork;
+            if (petaPocoUnitOfWork == null)
+            {
+                throw new Exception("Must be PocoUnitOfWork"); // TODO: Typed exception
+            }
 
-            _database = database;
+            _database = petaPocoUnitOfWork.Database;
 
             if (Mappers.GetMapper(typeof(T)) is StandardMapper)
             {
-                Mappers.Register(typeof(T), mapper);
+                Mappers.Register(typeof(T), petaPocoUnitOfWork.Mapper);
             }
         }
 
+
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            return _database.Fetch<T>(sqlCondition, args);
         }
 
         public override IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args)
         {
-            throw new NotImplementedException();
+            //Make sure that the sql Condition contains an ORDER BY Clause
+            if (!sqlCondition.ToUpperInvariant().Contains("ORDER BY"))
+            {
+                sqlCondition = String.Format("{0} ORDER BY {1}", sqlCondition, Util.GetPrimaryKeyName(typeof(T).GetTypeInfo()));
+            }
+            Page<T> petaPocoPage = _database.Page<T>(pageIndex + 1, pageSize, sqlCondition, args);
+
+            return new PagedList<T>(petaPocoPage.Items, (int)petaPocoPage.TotalItems, pageIndex, pageSize);
         }
 
         protected override void AddInternal(T item)
@@ -62,7 +72,7 @@ namespace Naif.Data.PetaPoco
             return _database.Fetch<T>("");
         }
 
-        protected override T GetByIdInternal<TProperty>(TProperty id)
+        protected override T GetByIdInternal(object id)
         {
             return _database.SingleOrDefault<T>(id);
         }
@@ -74,17 +84,22 @@ namespace Naif.Data.PetaPoco
 
         protected override IEnumerable<T> GetByScopeInternal(object propertyValue)
         {
-            throw new NotImplementedException();
+            return _database.Fetch<T>(GetScopeSql(), propertyValue);
         }
 
         protected override IPagedList<T> GetPageInternal(int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            return Find(pageIndex, pageSize, String.Empty);
         }
 
         protected override IPagedList<T> GetPageByScopeInternal(object propertyValue, int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            return Find(pageIndex, pageSize, GetScopeSql(), propertyValue);
+        }
+
+        private string GetScopeSql()
+        {
+            return String.Format("WHERE {0} = @0", Util.GetColumnName(typeof(T).GetTypeInfo(), Scope));
         }
 
         protected override void UpdateInternal(T item)

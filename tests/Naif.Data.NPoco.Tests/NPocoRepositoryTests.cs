@@ -12,7 +12,6 @@ using System.Data;
 using System.Linq;
 using Moq;
 using Naif.Core.Caching;
-using Naif.Data.NPoco;
 using Naif.TestUtilities;
 using Naif.TestUtilities.Models;
 using NPoco;
@@ -27,12 +26,12 @@ namespace Naif.Data.NPoco.Tests
         private readonly string[] _dogAges = TestConstants.NPOCO_DogAges.Split(',');
         private readonly string[] _dogNames = TestConstants.NPOCO_DogNames.Split(',');
 
-        private Database _pecaPocoDb;
+        private NPocoUnitOfWork _nPocoUnitOfWork;
 
         [SetUp]
         public void SetUp()
         {
-            _pecaPocoDb = CreatePecaPocoDatabase();
+            _nPocoUnitOfWork = CreateNPocoUnitOfWork();
         }
 
         [TearDown]
@@ -44,15 +43,12 @@ namespace Naif.Data.NPoco.Tests
         [Test]
         public void NPocoRepository_Constructor_Throws_On_Null_ICacheProvider()
         {
-            //Arrange
-            var db = new Database(ConnectionStringName);
-
-            //Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new NPocoRepository<Dog>(db, null));
+            //Arrange, Act, Assert
+            Assert.Throws<ArgumentNullException>(() => new NPocoRepository<Dog>(_nPocoUnitOfWork, null));
         }
 
         [Test]
-        public void NPocoRepository_Constructor_Throws_On_Null_Database()
+        public void NPocoRepository_Constructor_Throws_On_Null_UnitOfWork()
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
@@ -68,19 +64,18 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                Age = TestConstants.NPOCO_InsertDogAge,
-                Name = TestConstants.NPOCO_InsertDogName
-            };
+                            {
+                                Age = TestConstants.NPOCO_InsertDogAge,
+                                Name = TestConstants.NPOCO_InsertDogName
+                            };
 
             //Act
             repository.Add(dog);
 
             //Assert
-            int actualCount = DataUtil.GetRecordCount(TestConstants.NPOCO_DatabaseName,
-                TestConstants.NPOCO_TableName);
+            int actualCount = DataUtil.GetRecordCount(TestConstants.NPOCO_DatabaseName, TestConstants.NPOCO_TableName);
             Assert.AreEqual(TestConstants.NPOCO_RecordCount + 1, actualCount);
         }
 
@@ -91,7 +86,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 Age = TestConstants.NPOCO_InsertDogAge,
@@ -114,7 +109,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 Age = TestConstants.NPOCO_InsertDogAge,
@@ -139,7 +134,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.NPOCO_DeleteDogId,
@@ -163,7 +158,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.NPOCO_DeleteDogId,
@@ -189,7 +184,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.NPOCO_InvalidDogId,
@@ -208,6 +203,26 @@ namespace Naif.Data.NPoco.Tests
         }
 
         [Test]
+        [TestCase(1, "WHERE ID < @0", 2)]
+        [TestCase(4, "WHERE Age <= @0", 5)]
+        [TestCase(2, "WHERE Name LIKE @0", "S%")]
+        public void NPocoRepository_Find_Returns_Correct_Rows(int count, string sqlCondition, object arg)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            IEnumerable<Dog> dogs = repository.Find(sqlCondition, arg);
+
+            //Assert
+            Assert.AreEqual(count, dogs.Count());
+        }
+
+
+        [Test]
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(5)]
@@ -217,7 +232,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(count);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             IEnumerable<Dog> dogs = repository.GetAll();
@@ -233,7 +248,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetAll().ToList();
@@ -252,7 +267,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetAll();
@@ -270,7 +285,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
@@ -286,7 +301,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.NPOCO_InvalidDogId);
@@ -302,7 +317,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.NPOCO_ValidDogId);
@@ -321,7 +336,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -339,7 +354,7 @@ namespace Naif.Data.NPoco.Tests
             SetUpDatabase(5);
             var dogName = _dogNames[2];
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetByProperty("Name", dogName).FirstOrDefault();
@@ -356,7 +371,7 @@ namespace Naif.Data.NPoco.Tests
             SetUpDatabase(5);
             const string dogName = "Invalid";
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -375,7 +390,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -388,13 +403,89 @@ namespace Naif.Data.NPoco.Tests
         }
 
         [Test]
+        [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount)]
+        [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount)]
+        [TestCase(TestConstants.PAGE_Last, TestConstants.PAGE_RecordCount)]
+        public void NPocoRepository_GetPage_Returns_Page_Of_Rows(int pageIndex, int pageSize)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(pageIndex, pageSize);
+
+            //Assert
+            Assert.AreEqual(pageSize, dogs.PageSize);
+        }
+
+        [Test]
+        public void NPocoRepository_GetPage_Returns_List_Of_Models()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
+
+            //Assert
+            for (int i = 0; i < dogs.Count(); i++)
+            {
+                Assert.IsInstanceOf<Dog>(dogs[i]);
+            }
+        }
+
+        [Test]
+        public void NPocoRepository_GetPage_Returns_Models_With_Correct_Properties()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
+
+            //Assert
+            var dog = dogs.First();
+            Assert.AreEqual(_dogAges[0], dog.Age.ToString());
+            Assert.AreEqual(_dogNames[0], dog.Name);
+        }
+
+        [Test]
+        [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount, 1)]
+        [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount, 6)]
+        [TestCase(2, 4, 9)]
+        public void NPocoRepository_GetPage_Returns_Correct_Page(int pageIndex, int pageSize, int firstId)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(pageIndex, pageSize);
+
+            //Assert
+            var dog = dogs.First();
+            Assert.AreEqual(firstId, dog.ID);
+        }
+
+        [Test]
         public void NPocoRepository_Update_Updates_Item_In_DataBase()
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.NPOCO_UpdateDogId,
@@ -418,7 +509,7 @@ namespace Naif.Data.NPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.NPOCO_RecordCount);
 
-            var repository = new NPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.NPOCO_UpdateDogId,
@@ -441,9 +532,9 @@ namespace Naif.Data.NPoco.Tests
             }
         }
 
-        private Database CreatePecaPocoDatabase()
+        private NPocoUnitOfWork CreateNPocoUnitOfWork()
         {
-            return new Database(ConnectionStringName);
+            return new NPocoUnitOfWork(ConnectionStringName);
         }
 
         private void SetUpDatabase(int count)
@@ -452,7 +543,10 @@ namespace Naif.Data.NPoco.Tests
             DataUtil.ExecuteNonQuery(TestConstants.NPOCO_DatabaseName, TestConstants.NPOCO_CreateTableSql);
             for (int i = 0; i < count; i++)
             {
-                DataUtil.ExecuteNonQuery(TestConstants.NPOCO_DatabaseName, String.Format(TestConstants.NPOCO_InsertRow, _dogNames[i], _dogAges[i]));
+                var name = (i < _dogNames.Length) ? _dogNames[i] : String.Format("Name_{0}", i);
+                var age = (i < _dogNames.Length) ? _dogAges[i] : i.ToString();
+
+                DataUtil.ExecuteNonQuery(TestConstants.NPOCO_DatabaseName, String.Format(TestConstants.PETAPOCO_InsertRow, name, age));
             }
         }
     }

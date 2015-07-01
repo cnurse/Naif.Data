@@ -27,12 +27,12 @@ namespace Naif.Data.PetaPoco.Tests
         private readonly string[] _dogAges = TestConstants.PETAPOCO_DogAges.Split(',');
         private readonly string[] _dogNames = TestConstants.PETAPOCO_DogNames.Split(',');
 
-        private Database _pecaPocoDb;
+        private PetaPocoUnitOfWork _petaPocoUnitOfWork;
 
         [SetUp]
         public void SetUp()
         {
-            _pecaPocoDb = CreatePecaPocoDatabase();
+            _petaPocoUnitOfWork = CreatePetaPocoUnitOfWork();
         }
 
         [TearDown]
@@ -44,15 +44,12 @@ namespace Naif.Data.PetaPoco.Tests
         [Test]
         public void PetaPocoRepository_Constructor_Throws_On_Null_ICacheProvider()
         {
-            //Arrange
-            var db = new Database(ConnectionStringName);
-
-            //Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new PetaPocoRepository<Dog>(db, null));
+            //Arrange, Act, Assert
+            Assert.Throws<ArgumentNullException>(() => new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, null));
         }
 
         [Test]
-        public void PetaPocoRepository_Constructor_Throws_On_Null_Database()
+        public void PetaPocoRepository_Constructor_Throws_On_Null_UnitOfWork()
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
@@ -68,12 +65,12 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                Age = TestConstants.PETAPOCO_InsertDogAge,
-                Name = TestConstants.PETAPOCO_InsertDogName
-            };
+                            {
+                                Age = TestConstants.PETAPOCO_InsertDogAge,
+                                Name = TestConstants.PETAPOCO_InsertDogName
+                            };
 
             //Act
             repository.Add(dog);
@@ -91,12 +88,12 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                Age = TestConstants.PETAPOCO_InsertDogAge,
-                Name = TestConstants.PETAPOCO_InsertDogName
-            };
+                            {
+                                Age = TestConstants.PETAPOCO_InsertDogAge,
+                                Name = TestConstants.PETAPOCO_InsertDogName
+                            };
 
             //Act
             repository.Add(dog);
@@ -114,12 +111,12 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                Age = TestConstants.PETAPOCO_InsertDogAge,
-                Name = TestConstants.PETAPOCO_InsertDogName
-            };
+                            {
+                                Age = TestConstants.PETAPOCO_InsertDogAge,
+                                Name = TestConstants.PETAPOCO_InsertDogName
+                            };
 
             //Act
             repository.Add(dog);
@@ -139,13 +136,13 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                ID = TestConstants.PETAPOCO_DeleteDogId,
-                Age = TestConstants.PETAPOCO_DeleteDogAge,
-                Name = TestConstants.PETAPOCO_DeleteDogName
-            };
+                            {
+                                ID = TestConstants.PETAPOCO_DeleteDogId,
+                                Age = TestConstants.PETAPOCO_DeleteDogAge,
+                                Name = TestConstants.PETAPOCO_DeleteDogName
+                            };
 
             //Act
             repository.Delete(dog);
@@ -163,13 +160,13 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                ID = TestConstants.PETAPOCO_DeleteDogId,
-                Age = TestConstants.PETAPOCO_DeleteDogAge,
-                Name = TestConstants.PETAPOCO_DeleteDogName
-            };
+                            {
+                                ID = TestConstants.PETAPOCO_DeleteDogId,
+                                Age = TestConstants.PETAPOCO_DeleteDogAge,
+                                Name = TestConstants.PETAPOCO_DeleteDogName
+                            };
 
             //Act
             repository.Delete(dog);
@@ -189,13 +186,13 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
-            {
-                ID = TestConstants.PETAPOCO_InvalidDogId,
-                Age = TestConstants.PETAPOCO_DeleteDogAge,
-                Name = TestConstants.PETAPOCO_DeleteDogName
-            };
+                            {
+                                ID = TestConstants.PETAPOCO_InvalidDogId,
+                                Age = TestConstants.PETAPOCO_DeleteDogAge,
+                                Name = TestConstants.PETAPOCO_DeleteDogName
+                            };
 
             //Act
             repository.Delete(dog);
@@ -208,6 +205,25 @@ namespace Naif.Data.PetaPoco.Tests
         }
 
         [Test]
+        [TestCase(1, "WHERE ID < @0", 2)]
+        [TestCase(4, "WHERE Age <= @0", 5)]
+        [TestCase(2, "WHERE Name LIKE @0", "S%")]
+        public void PetaPocoRepository_Find_Returns_Correct_Rows(int count, string sqlCondition, object arg)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            IEnumerable<Dog> dogs = repository.Find(sqlCondition, arg);
+
+            //Assert
+            Assert.AreEqual(count, dogs.Count());
+        }
+
+        [Test]
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(5)]
@@ -217,7 +233,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(count);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             IEnumerable<Dog> dogs = repository.GetAll();
@@ -233,7 +249,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetAll().ToList();
@@ -252,7 +268,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetAll();
@@ -270,7 +286,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.PETAPOCO_ValidDogId);
@@ -286,7 +302,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.PETAPOCO_InvalidDogId);
@@ -302,7 +318,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetById(TestConstants.PETAPOCO_ValidDogId);
@@ -321,7 +337,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -339,7 +355,7 @@ namespace Naif.Data.PetaPoco.Tests
             SetUpDatabase(5);
             var dogName = _dogNames[2];
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dog = repository.GetByProperty("Name", dogName).FirstOrDefault();
@@ -356,7 +372,7 @@ namespace Naif.Data.PetaPoco.Tests
             SetUpDatabase(5);
             const string dogName = "Invalid";
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -375,7 +391,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
 
             //Act
             var dogs = repository.GetByProperty("Name", dogName);
@@ -388,13 +404,89 @@ namespace Naif.Data.PetaPoco.Tests
         }
 
         [Test]
+        [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount)]
+        [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount)]
+        [TestCase(TestConstants.PAGE_Last, TestConstants.PAGE_RecordCount)]
+        public void PetaPocoRepository_GetPage_Returns_Page_Of_Rows(int pageIndex, int pageSize)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(pageIndex, pageSize);
+
+            //Assert
+            Assert.AreEqual(pageSize, dogs.PageSize);
+        }
+
+        [Test]
+        public void PetaPocoRepository_GetPage_Returns_List_Of_Models()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
+
+            //Assert
+            for (int i = 0; i < dogs.Count(); i++)
+            {
+                Assert.IsInstanceOf<Dog>(dogs[i]);
+            }
+        }
+
+        [Test]
+        public void PetaPocoRepository_GetPage_Returns_Models_With_Correct_Properties()
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
+
+            //Assert
+            var dog = dogs.First();
+            Assert.AreEqual(_dogAges[0], dog.Age.ToString());
+            Assert.AreEqual(_dogNames[0], dog.Name);
+        }
+
+        [Test]
+        [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount, 1)]
+        [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount, 6)]
+        [TestCase(2, 4, 9)]
+        public void PetaPocoRepository_GetPage_Returns_Correct_Page(int pageIndex, int pageSize, int firstId)
+        {
+            //Arrange
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PAGE_TotalCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            var dogs = repository.GetPage(pageIndex, pageSize);
+
+            //Assert
+            var dog = dogs.First();
+            Assert.AreEqual(firstId, dog.ID);
+        }
+
+        [Test]
         public void PetaPocoRepository_Update_Updates_Item_In_DataBase()
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.PETAPOCO_UpdateDogId,
@@ -418,7 +510,7 @@ namespace Naif.Data.PetaPoco.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
 
-            var repository = new PetaPocoRepository<Dog>(_pecaPocoDb, mockCache.Object);
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.PETAPOCO_UpdateDogId,
@@ -441,9 +533,9 @@ namespace Naif.Data.PetaPoco.Tests
             }
         }
 
-        private Database CreatePecaPocoDatabase()
+        private PetaPocoUnitOfWork CreatePetaPocoUnitOfWork()
         {
-            return new Database(ConnectionStringName);
+            return new PetaPocoUnitOfWork(ConnectionStringName);
         }
 
         private void SetUpDatabase(int count)
@@ -452,7 +544,10 @@ namespace Naif.Data.PetaPoco.Tests
             DataUtil.ExecuteNonQuery(TestConstants.PETAPOCO_DatabaseName, TestConstants.PETAPOCO_CreateTableSql);
             for (int i = 0; i < count; i++)
             {
-                DataUtil.ExecuteNonQuery(TestConstants.PETAPOCO_DatabaseName, String.Format(TestConstants.PETAPOCO_InsertRow, _dogNames[i], _dogAges[i]));
+                var name = (i < _dogNames.Length) ? _dogNames[i] : String.Format("Name_{0}", i);
+                var age = (i < _dogNames.Length) ? _dogAges[i] : i.ToString();
+
+                DataUtil.ExecuteNonQuery(TestConstants.PETAPOCO_DatabaseName, String.Format(TestConstants.PETAPOCO_InsertRow, name, age));
             }
         }
     }

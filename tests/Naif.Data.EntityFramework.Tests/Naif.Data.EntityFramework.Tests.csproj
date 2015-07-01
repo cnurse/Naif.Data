@@ -70,8 +70,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EFDataContextTests.cs" />
-    <Compile Include="EFRepositoryTests.cs" />
+    <Compile Include="EFUnitOfWorkTests.cs" />
+    <Compile Include="EFLinqRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
