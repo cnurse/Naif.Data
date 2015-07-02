@@ -8,6 +8,7 @@
 
 using System;
 using Naif.TestUtilities;
+using Naif.TestUtilities.Models;
 using NUnit.Framework;
 
 namespace Naif.Data.EntityFramework.Tests
@@ -46,6 +47,29 @@ namespace Naif.Data.EntityFramework.Tests
         {
             //Arrange, Act, Assert
             Assert.Throws<ArgumentNullException>(() => new EFUnitOfWork(null));
+        }
+
+        [Test]
+        public void EFUnitOfWork_GetLinqRepository_Returns_Repository()
+        {
+            //Arrange, Act
+            var context = new EFUnitOfWork(ConnectionStringName, null);
+
+            //Act
+            var rep = context.GetLinqRepository<Dog>();
+
+            //Assert
+            Assert.IsInstanceOf<ILinqRepository<Dog>>(rep);
+        }
+
+        [Test]
+        public void EFUnitOfWork_GetRepository_Throwsy()
+        {
+            //Arrange, Act
+            var context = new EFUnitOfWork(ConnectionStringName, null);
+
+            //Act, Assert
+            Assert.Throws<NotImplementedException>(() => context.GetRepository<Dog>());
         }
 
         [Test]

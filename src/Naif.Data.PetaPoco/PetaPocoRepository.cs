@@ -39,7 +39,6 @@ namespace Naif.Data.PetaPoco
             }
         }
 
-
         public override IEnumerable<T> Find(string sqlCondition, params object[] args)
         {
             return _database.Fetch<T>(sqlCondition, args);

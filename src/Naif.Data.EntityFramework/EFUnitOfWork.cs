@@ -8,7 +8,6 @@
 
 using System;
 using System.Data.Entity;
-using Naif.Core.Caching;
 using Naif.Core.Contracts;
 
 namespace Naif.Data.EntityFramework
@@ -34,6 +33,16 @@ namespace Naif.Data.EntityFramework
         public void Commit()
         {
             _dbContext.SaveChanges();
+        }
+
+        public IRepository<T> GetRepository<T>() where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public ILinqRepository<T> GetLinqRepository<T>() where T : class
+        {
+            return new EFLinqRepository<T>(this);
         }
 
         internal NaifDbContext DbContext()

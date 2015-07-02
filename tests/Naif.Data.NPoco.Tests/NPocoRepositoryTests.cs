@@ -28,9 +28,12 @@ namespace Naif.Data.NPoco.Tests
 
         private NPocoUnitOfWork _nPocoUnitOfWork;
 
+        private Mock<ICacheProvider> _cache;
+
         [SetUp]
         public void SetUp()
         {
+            _cache = new Mock<ICacheProvider>();
             _nPocoUnitOfWork = CreateNPocoUnitOfWork();
         }
 
@@ -534,7 +537,7 @@ namespace Naif.Data.NPoco.Tests
 
         private NPocoUnitOfWork CreateNPocoUnitOfWork()
         {
-            return new NPocoUnitOfWork(ConnectionStringName);
+            return new NPocoUnitOfWork(ConnectionStringName, _cache.Object);
         }
 
         private void SetUpDatabase(int count)

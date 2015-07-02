@@ -29,9 +29,12 @@ namespace Naif.Data.PetaPoco.Tests
 
         private PetaPocoUnitOfWork _petaPocoUnitOfWork;
 
+        private Mock<ICacheProvider> _cache;
+
         [SetUp]
         public void SetUp()
         {
+            _cache = new Mock<ICacheProvider>();
             _petaPocoUnitOfWork = CreatePetaPocoUnitOfWork();
         }
 
@@ -535,7 +538,7 @@ namespace Naif.Data.PetaPoco.Tests
 
         private PetaPocoUnitOfWork CreatePetaPocoUnitOfWork()
         {
-            return new PetaPocoUnitOfWork(ConnectionStringName);
+            return new PetaPocoUnitOfWork(ConnectionStringName, _cache.Object);
         }
 
         private void SetUpDatabase(int count)
