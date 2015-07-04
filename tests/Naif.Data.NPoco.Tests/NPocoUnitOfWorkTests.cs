@@ -74,25 +74,5 @@ namespace Naif.Data.NPoco.Tests
             //Assert
             Assert.IsInstanceOf<IRepository<Dog>>(rep);
         }
-
-        [Test]
-        public void NPocoUnitOfWork_GetLinqRepository_Throwsy()
-        {
-            //Arrange, Act
-            var context = new NPocoUnitOfWork(ConnectionStringName, _cache.Object);
-
-            //Act, Assert
-            Assert.Throws<NotImplementedException>(() => context.GetLinqRepository<Dog>());
-        }
-
-        [Test]
-        public void NPocoUnitOfWork_SupportsLinq_Property_Returns_False()
-        {
-            //Arrange
-            var context = new NPocoUnitOfWork(ConnectionStringName, _cache.Object);
-
-            //ssert
-            Assert.IsFalse(context.SupportsLinq);
-        }
     }
 }

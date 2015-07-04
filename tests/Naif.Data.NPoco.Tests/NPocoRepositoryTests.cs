@@ -224,6 +224,23 @@ namespace Naif.Data.NPoco.Tests
             Assert.AreEqual(count, dogs.Count());
         }
 
+        [Test]
+        public void NPocoRepository_Find_Overload_Returns_Correct_Rows()
+        {
+            //Arrange
+            var count = 4;
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+
+            var repository = new NPocoRepository<Dog>(_nPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            IEnumerable<Dog> dogs = repository.Find((d) => d.Age <= 5);
+
+            //Assert
+            Assert.AreEqual(count, dogs.Count());
+        }
+
 
         [Test]
         [TestCase(0)]

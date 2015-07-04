@@ -38,17 +38,7 @@ namespace Naif.Data.NPoco
             return new NPocoRepository<T>(this, _cache);
         }
 
-        public ILinqRepository<T> GetLinqRepository<T>() where T : class
-        {
-            throw new NotImplementedException();
-        }
-
         internal Database Database { get; private set; }
-
-        public bool SupportsLinq
-        {
-            get { return false; }
-        }
 
         public void Dispose()
         {

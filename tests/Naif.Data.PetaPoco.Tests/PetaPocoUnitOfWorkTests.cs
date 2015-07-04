@@ -81,25 +81,5 @@ namespace Naif.Data.PetaPoco.Tests
             //Assert
             Assert.IsInstanceOf<IRepository<Dog>>(rep);
         }
-
-        [Test]
-        public void PetaPocoUnitOfWork_GetLinqRepository_Throwsy()
-        {
-            //Arrange, Act
-            var context = new PetaPocoUnitOfWork(ConnectionStringName, _cache.Object);
-
-            //Act, Assert
-            Assert.Throws<NotImplementedException>(() => context.GetLinqRepository<Dog>());
-        }
-
-        [Test]
-        public void PetaPocoUnitOfWork_SupportsLinq_Property_Returns_False()
-        {
-            //Arrange, Act
-            var context = new PetaPocoUnitOfWork(ConnectionStringName, _cache.Object);
-
-            //Assert
-            Assert.IsFalse(context.SupportsLinq);
-        }
     }
 }

@@ -8,23 +8,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Naif.Core.Collections;
 
 namespace Naif.Data
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<TModel> where TModel : class
     {
         /// <summary>
         /// Add an Item into the repository
         /// </summary>
         /// <param name="item">The item to be added</param>
-        void Add(T item);
+        void Add(TModel item);
 
         /// <summary>
         /// Delete an Item from the repository
         /// </summary>
         /// <param name="item">The item to be deleted</param>
-        void Delete(T item);
+        void Delete(TModel item);
 
         /// <summary>
         /// Find items from the repository based on a sql condition
@@ -35,7 +36,7 @@ namespace Naif.Data
         /// <param name="args">A collection of arguments to be mapped to the tokens in the sqlCondition</param>
         /// <example>Find("where ArticleId = @0 and UserId = @1", articleId, userId)</example>
         /// <returns>A list of items</returns>
-        IEnumerable<T> Find(string sqlCondition, params object[] args);
+        IEnumerable<TModel> Find(string sqlCondition, params object[] args);
 
         /// <summary>
         /// Find a GetPage of items from the repository based on a sql condition
@@ -47,7 +48,23 @@ namespace Naif.Data
         /// <param name="sqlCondition">The sql condition e.g. "WHERE ArticleId = @0"</param>
         /// <param name="args">A collection of arguments to be mapped to the tokens in the sqlCondition</param>
         /// <returns>A list of items</returns>
-        IPagedList<T> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args);
+        IPagedList<TModel> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args);
+
+        /// <summary>
+        /// Find items from the repository based on a Linq predicate
+        /// </summary>
+        /// <param name="predicate">The Linq predicate"</param>
+        /// <returns>A list of items</returns>
+        IEnumerable<TModel> Find(Expression<Func<TModel, bool>> predicate);
+
+        /// <summary>
+        /// Find a Page of items from the repository based on a Linq predicate
+        /// </summary>
+        /// <param name="pageIndex">The page Index to fetch</param>
+        /// <param name="pageSize">The size of the page to fetch</param>
+        /// <param name="predicate">The Linq predicate"</param>
+        /// <returns>A list of items</returns>
+        IPagedList<TModel> Find(int pageIndex, int pageSize, Expression<Func<TModel, bool>> predicate);
 
         /// <summary>
         /// Returns an enumerable list of items filtered by scope
@@ -60,13 +77,13 @@ namespace Naif.Data
         /// <typeparam name="TScopeType">The type of the scope field</typeparam>
         /// <param name="scopeValue">The value of the scope to filter by</param>
         /// <returns>The list of items</returns>
-        IEnumerable<T> Get<TScopeType>(TScopeType scopeValue);
+        IEnumerable<TModel> Get<TScopeType>(TScopeType scopeValue);
 
         /// <summary>
         /// Returns all the items in the repository as an enumerable list
         /// </summary>
         /// <returns>The list of items</returns>
-        IEnumerable<T> GetAll();
+        IEnumerable<TModel> GetAll();
 
         /// <summary>
         /// Get an individual item based on the items Id field
@@ -74,7 +91,7 @@ namespace Naif.Data
         /// <typeparam name="TProperty">The type of the Id field</typeparam>
         /// <param name="id">The value of the Id field</param>
         /// <returns>An item</returns>
-        T GetById<TProperty>(TProperty id);
+        TModel GetById<TProperty>(TProperty id);
 
         /// <summary>
         /// Get an individual item based on the items Id field
@@ -89,7 +106,7 @@ namespace Naif.Data
         /// <typeparam name="TScopeType">The type of the scope field</typeparam>
         /// <param name="scopeValue">The value of the scope to filter by</param>
         /// <returns>An item</returns>
-        T GetById<TProperty, TScopeType>(TProperty id, TScopeType scopeValue);
+        TModel GetById<TProperty, TScopeType>(TProperty id, TScopeType scopeValue);
 
         /// <summary>
         /// Returns a page of items in the repository as a paged list
@@ -97,7 +114,7 @@ namespace Naif.Data
         /// <param name="pageIndex">The page Index to fetch</param>
         /// <param name="pageSize">The size of the page to fetch</param>
         /// <returns>The list of items</returns>
-        IPagedList<T> GetPage(int pageIndex, int pageSize);
+        IPagedList<TModel> GetPage(int pageIndex, int pageSize);
 
         /// <summary>
         /// Returns a page of items in the repository as a paged list filtered by scope
@@ -112,15 +129,15 @@ namespace Naif.Data
         /// <param name="pageIndex">The page Index to fetch</param>
         /// <param name="pageSize">The size of the page to fetch</param>
         /// <returns>The list of items</returns>
-        IPagedList<T> GetPage<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize);
+        IPagedList<TModel> GetPage<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize);
 
         /// <summary>
         /// Updates an Item in the repository
         /// </summary>
         /// <param name="item">The item to be updated</param>
-        void Update(T item);
+        void Update(TModel item);
 
         [ObsoleteAttribute("Deprecated in version 1.2.0. Use one of the Find methods which provide more flexibility")]
-        IEnumerable<T> GetByProperty<TProperty>(string propertyName, TProperty propertyValue);
+        IEnumerable<TModel> GetByProperty<TProperty>(string propertyName, TProperty propertyValue);
     }
 }

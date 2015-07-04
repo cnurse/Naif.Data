@@ -7,20 +7,22 @@
 // *****************************************
 
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Naif.Core.Caching;
 using Naif.Core.Collections;
 using Naif.Core.Contracts;
 
 namespace Naif.Data.EntityFramework
 {
-    public class EFLinqRepository<T> : ILinqRepository<T> where T : class
+    public class EFLinqRepository<TModel> : LinqRepositoryBase<TModel> where TModel : class
     {
         private readonly NaifDbContext _context;
-        private readonly IDbSet<T> _dbSet;
+        private readonly IDbSet<TModel> _dbSet;
 
-        public EFLinqRepository(IUnitOfWork unitOfWork)
+        public EFLinqRepository(IUnitOfWork unitOfWork, ICacheProvider cache) :base(cache)
         {
             Requires.NotNull("unitOfWork", unitOfWork);
 
@@ -30,49 +32,52 @@ namespace Naif.Data.EntityFramework
                 throw new Exception("Must be EFUnitOfWork"); // TODO: Typed exception
             }
             _context = efUnitOfWork.DbContext();
-            _dbSet = _context.Set<T>();
+            _dbSet = _context.Set<TModel>();
         }
 
-        public void Add(T item)
-        {
-            _dbSet.Add(item);
-        }
-
-        public void Delete(T item)
-        {
-            _dbSet.Attach(item);
-            _dbSet.Remove(item);
-        }
-
-        public IQueryable<T> Find(Expression<Func<T, bool>> predicate)
+        public override IQueryable<TModel> Find(Expression<Func<TModel, bool>> predicate)
         {
             return _dbSet.Where(predicate);
         }
 
-        public IPagedList<T> Find(int pageIndex, int pageSize, Expression<Func<T, bool>> predicate)
+        public override IPagedList<TModel> Find(int pageIndex, int pageSize, Expression<Func<TModel, bool>> predicate)
         {
             return _dbSet.Where(predicate).InPagesOf(pageSize).GetPage(pageIndex);
         }
 
-        public IQueryable<T> GetAll()
+        protected override void AddInternal(TModel item)
         {
-            return _dbSet.AsQueryable();
+            _dbSet.Add(item);
         }
 
-        public IPagedList<T> GetPage(int pageIndex, int pageSize)
+        protected override void DeleteInternal(TModel item)
         {
-            return _dbSet.InPagesOf(pageSize).GetPage(pageIndex);
+            _dbSet.Remove(item);
         }
 
-        public T GetSingle(Expression<Func<T, bool>> predicate)
+        protected override IEnumerable<TModel> GetAllInternal()
         {
-            return _dbSet.SingleOrDefault(predicate);
+            return _dbSet;
         }
 
-        public void Update(T item)
+        protected override IEnumerable<TModel> GetByScopeInternal<TScopeType>(TScopeType scopeValue)
         {
-            _dbSet.Attach(item);
-            _context.Entry(item).State = EntityState.Modified;
+            throw new NotImplementedException();
+        }
+
+        protected override IPagedList<TModel> GetPageByScopeInternal<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IPagedList<TModel> GetPageInternal(int pageIndex, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void UpdateInternal(TModel item)
+        {
+            
         }
     }
 }

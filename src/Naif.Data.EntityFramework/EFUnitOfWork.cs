@@ -8,26 +8,32 @@
 
 using System;
 using System.Data.Entity;
+using Naif.Core.Caching;
 using Naif.Core.Contracts;
 
 namespace Naif.Data.EntityFramework
 {
     public class EFUnitOfWork : IUnitOfWork
     {
+        private readonly ICacheProvider _cache;
         private readonly NaifDbContext _dbContext;
 
-        public EFUnitOfWork(string connectionString, Action<DbModelBuilder> modelCreateCallback)
+        public EFUnitOfWork(string connectionString, Action<DbModelBuilder> modelCreateCallback, ICacheProvider cache)
         {
+            Requires.NotNull(cache);
             Requires.NotNullOrEmpty("connectionString", connectionString);
 
             _dbContext = new NaifDbContext(connectionString, modelCreateCallback);
+            _cache = cache;
         }
 
-        public EFUnitOfWork(NaifDbContext dbContext)
+        public EFUnitOfWork(NaifDbContext dbContext, ICacheProvider cache)
         {
-            Requires.NotNull("dbContext", dbContext);
+            Requires.NotNull(dbContext);
+            Requires.NotNull(cache);
 
             _dbContext = dbContext;
+            _cache = cache;
         }
 
         public void Commit()
@@ -42,7 +48,7 @@ namespace Naif.Data.EntityFramework
 
         public ILinqRepository<T> GetLinqRepository<T>() where T : class
         {
-            return new EFLinqRepository<T>(this);
+            return new EFLinqRepository<T>(this, _cache);
         }
 
         internal NaifDbContext DbContext()

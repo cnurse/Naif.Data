@@ -9,9 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using Moq;
 using Naif.Core.Caching;
@@ -28,11 +25,14 @@ namespace Naif.Data.EntityFramework.Tests
         private readonly string[] _dogAges = TestConstants.EF_DogAges.Split(',');
         private readonly string[] _dogNames = TestConstants.EF_DogNames.Split(',');
 
+        private Mock<ICacheProvider> _cache;
+
         private EFUnitOfWork _efUnitOfWork;
 
         [SetUp]
         public void SetUp()
         {
+            _cache = new Mock<ICacheProvider>();
         }
 
         [TearDown]
@@ -45,7 +45,7 @@ namespace Naif.Data.EntityFramework.Tests
         public void EFLinqRepository_Constructor_Throws_On_Null_DbContext()
         {
             //Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new EFLinqRepository<Dog>(null));
+            Assert.Throws<ArgumentNullException>(() => new EFLinqRepository<Dog>(null, _cache.Object));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -76,7 +76,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -98,7 +98,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -123,7 +123,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_DeleteDogId,
@@ -146,7 +146,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.EF_DeleteDogId,
@@ -172,7 +172,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_InvalidDogId,
@@ -205,7 +205,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -222,7 +222,7 @@ namespace Naif.Data.EntityFramework.Tests
             SetUpDatabase(5);
             var dogName = _dogNames[2];
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dog = repository.Find((d) => d.Name == dogName).FirstOrDefault();
@@ -238,7 +238,7 @@ namespace Naif.Data.EntityFramework.Tests
             SetUpDatabase(5);
             const string dogName = "Invalid";
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -256,7 +256,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -277,7 +277,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(count);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             IEnumerable<Dog> dogs = repository.GetAll();
@@ -293,7 +293,7 @@ namespace Naif.Data.EntityFramework.Tests
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetAll().ToList();
@@ -311,7 +311,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetAll();
@@ -331,7 +331,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(pageIndex, pageSize);
@@ -346,7 +346,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
@@ -364,7 +364,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
@@ -384,7 +384,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(pageIndex, pageSize);
@@ -395,53 +395,53 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
 
-        [Test]
-        public void EFLinqRepository_GetSingle_Returns_Instance_Of_Model_If_Valid_Id()
-        {
-            //Arrange
-            SetUpDatabase(5);
+        //[Test]
+        //public void EFLinqRepository_GetSingle_Returns_Instance_Of_Model_If_Valid_Id()
+        //{
+        //    //Arrange
+        //    SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
-            //Act
-            var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
+        //    //Act
+        //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
 
-            //Assert
-            Assert.IsInstanceOf<Dog>(dog);
-        }
+        //    //Assert
+        //    Assert.IsInstanceOf<Dog>(dog);
+        //}
 
-        [Test]
-        public void EFLinqRepository_GetSingle_Returns_Null_If_InValid_Id()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
+        //[Test]
+        //public void EFLinqRepository_GetSingle_Returns_Null_If_InValid_Id()
+        //{
+        //    //Arrange
+        //    var mockCache = new Mock<ICacheProvider>();
+        //    SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
-            //Act
-            var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_InvalidDogId);
+        //    //Act
+        //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_InvalidDogId);
 
-            //Assert
-            Assert.IsNull(dog);
-        }
+        //    //Assert
+        //    Assert.IsNull(dog);
+        //}
 
-        [Test]
-        public void EFLinqRepository_GetSingle_Returns_Model_With_Correct_Properties()
-        {
-            //Arrange
-            var mockCache = new Mock<ICacheProvider>();
-            SetUpDatabase(5);
+        //[Test]
+        //public void EFLinqRepository_GetSingle_Returns_Model_With_Correct_Properties()
+        //{
+        //    //Arrange
+        //    var mockCache = new Mock<ICacheProvider>();
+        //    SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
 
-            //Act
-            var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
+        //    //Act
+        //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
 
-            //Assert
-            Assert.AreEqual(TestConstants.EF_ValidDogAge, dog.Age);
-            Assert.AreEqual(TestConstants.EF_ValidDogName, dog.Name);
-        }
+        //    //Assert
+        //    Assert.AreEqual(TestConstants.EF_ValidDogAge, dog.Age);
+        //    Assert.AreEqual(TestConstants.EF_ValidDogName, dog.Name);
+        //}
 
         [Test]
         public void EFLinqRepository_Update_Updates_Item_In_DataBase()
@@ -449,7 +449,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_UpdateDogId,
@@ -472,7 +472,7 @@ namespace Naif.Data.EntityFramework.Tests
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork);
+            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_UpdateDogId,
@@ -498,7 +498,7 @@ namespace Naif.Data.EntityFramework.Tests
 
         private EFUnitOfWork CreateEFUnitOfWork()
         {
-            return new EFUnitOfWork(ConnectionStringName, (modelBuilder) => modelBuilder.Entity<Dog>().ToTable("Dogs"));
+            return new EFUnitOfWork(ConnectionStringName, (modelBuilder) => modelBuilder.Entity<Dog>().ToTable("Dogs"), _cache.Object);
         }
 
         private void SetUpDatabase(int count)

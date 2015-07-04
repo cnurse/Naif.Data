@@ -227,6 +227,23 @@ namespace Naif.Data.PetaPoco.Tests
         }
 
         [Test]
+        public void PetaPocoRepository_Find_Overload_Returns_Correct_Rows()
+        {
+            //Arrange
+            var count = 4;
+            var mockCache = new Mock<ICacheProvider>();
+            SetUpDatabase(TestConstants.PETAPOCO_RecordCount);
+
+            var repository = new PetaPocoRepository<Dog>(_petaPocoUnitOfWork, mockCache.Object);
+
+            //Act
+            IEnumerable<Dog> dogs = repository.Find((d) => d.Age <= 5);
+
+            //Assert
+            Assert.AreEqual(count, dogs.Count());
+        }
+
+        [Test]
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(5)]

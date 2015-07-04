@@ -15,9 +15,5 @@ namespace Naif.Data
         void Commit();
 
         IRepository<T> GetRepository<T>() where T : class;
-
-        ILinqRepository<T> GetLinqRepository<T>() where T : class;
-
-        bool SupportsLinq { get; }
     }
 }

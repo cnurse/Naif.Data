@@ -38,7 +38,6 @@
     <Compile Include="ComponentModel\ColumnNameAttribute.cs" />
     <Compile Include="ComponentModel\ScopeAttribute.cs" />
     <Compile Include="IUnitOfWork.cs" />
-    <Compile Include="ILinqRepository.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="ComponentModel\PrimaryKeyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
