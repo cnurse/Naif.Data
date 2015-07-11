@@ -20,7 +20,7 @@ namespace Naif.Data
 {
     public abstract class RepositoryBase<TModel> : IRepository<TModel> where TModel : class
     {
-        private ICacheProvider _cache;
+        private readonly ICacheProvider _cache;
 
         protected RepositoryBase(ICacheProvider cache)
         {
@@ -29,16 +29,15 @@ namespace Naif.Data
             _cache = cache;
 
             Initialize();
-
         }
 
-        protected string CacheKey { get; private set; }
+        public string CacheKey { get; set; }
 
-        protected bool IsCacheable { get; private set; }
+        public bool IsCacheable { get; set; }
 
-        protected bool IsScoped { get; private set; }
+        public bool IsScoped { get; set; }
 
-        protected string Scope { get; private set; }
+        public string Scope { get; set; }
 
         public void Add(TModel item)
         {
