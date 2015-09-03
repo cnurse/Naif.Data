@@ -158,9 +158,21 @@ namespace Naif.Data
 
         private TProperty GetPropertyValue<TProperty>(TypeInfo modelType, TModel item, string propertyName)
         {
-            var property = modelType.DeclaredProperties.SingleOrDefault(p => p.Name == propertyName);
+            var property = GetProperty(modelType, propertyName);
 
             return (TProperty)property.GetValue(item, null);
+        }
+
+        private PropertyInfo GetProperty(TypeInfo typeInfo, string propertyName)
+        {
+            var property = typeInfo.GetDeclaredProperty(propertyName);
+
+            if (property == null && typeInfo.BaseType != typeof(object))
+            {
+                property = GetProperty(typeInfo.BaseType.GetTypeInfo(), propertyName);
+            }
+
+            return property;
         }
 
         private TProperty GetPropertyValue<TProperty>(TModel item, string propertyName)
