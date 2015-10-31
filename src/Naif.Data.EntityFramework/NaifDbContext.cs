@@ -8,7 +8,6 @@
 
 using System;
 using System.Data.Entity;
-using Naif.TestUtilities.Models;
 
 namespace Naif.Data.EntityFramework
 {

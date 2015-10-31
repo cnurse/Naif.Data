@@ -41,8 +41,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Dog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Dog>;
-            Assert.AreEqual(String.Empty,Util.GetPrivateProperty<RepositoryBase<Dog>, string>(baseRepo, "CacheKey"));
+            Assert.AreEqual(String.Empty, repo.CacheKey);
         }
 
         [Test]
@@ -54,8 +53,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableDog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableDog>;
-            Assert.AreEqual(TestConstants.CACHE_DogsKey, Util.GetPrivateProperty<RepositoryBase<CacheableDog>, string>(baseRepo, "CacheKey"));
+            Assert.AreEqual(TestConstants.CACHE_DogsKey, repo.CacheKey);
         }
 
         [Test]
@@ -67,8 +65,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Dog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Dog>;
-            Assert.IsFalse(Util.GetPrivateProperty<RepositoryBase<Dog>, bool>(baseRepo, "IsCacheable"));
+            Assert.IsFalse(repo.IsCacheable);
         }
 
         [Test]
@@ -80,8 +77,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableDog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableDog>;
-            Assert.IsTrue(Util.GetPrivateProperty<RepositoryBase<CacheableDog>, bool>(baseRepo, "IsCacheable"));
+            Assert.IsTrue(repo.IsCacheable);
         }
 
         [Test]
@@ -93,8 +89,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Dog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Dog>;
-            Assert.IsFalse(Util.GetPrivateProperty<RepositoryBase<Dog>, bool>(baseRepo, "IsScoped"));
+            Assert.IsFalse(repo.IsScoped);
         }
 
         [Test]
@@ -106,8 +101,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableDog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableDog>;
-            Assert.IsFalse(Util.GetPrivateProperty<RepositoryBase<CacheableDog>, bool>(baseRepo, "IsScoped"));
+            Assert.IsFalse(repo.IsScoped);
         }
 
         [Test]
@@ -119,8 +113,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Cat>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Cat>;
-            Assert.IsTrue(Util.GetPrivateProperty<RepositoryBase<Cat>, bool>(baseRepo, "IsScoped"));
+            Assert.IsTrue(repo.IsScoped);
         }
 
         [Test]
@@ -132,8 +125,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableCat>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableCat>;
-            Assert.IsTrue(Util.GetPrivateProperty<RepositoryBase<CacheableCat>, bool>(baseRepo, "IsScoped"));
+            Assert.IsTrue(repo.IsScoped);
         }
 
         [Test]
@@ -145,8 +137,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Dog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Dog>;
-            Assert.AreEqual(String.Empty, Util.GetPrivateProperty<RepositoryBase<Dog>, string>(baseRepo, "Scope"));
+            Assert.AreEqual(String.Empty, repo.Scope);
         }
 
         [Test]
@@ -158,8 +149,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableDog>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableDog>;
-            Assert.AreEqual(String.Empty, Util.GetPrivateProperty<RepositoryBase<CacheableDog>, string>(baseRepo, "Scope"));
+            Assert.AreEqual(String.Empty, repo.Scope);
         }
 
         [Test]
@@ -171,8 +161,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<Cat>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<Cat>;
-            Assert.AreEqual(TestConstants.CACHE_ScopeModule, Util.GetPrivateProperty<RepositoryBase<Cat>, string>(baseRepo, "Scope"));
+            Assert.AreEqual(TestConstants.CACHE_ScopeModule, repo.Scope);
         }
 
         [Test]
@@ -184,8 +173,7 @@ namespace Naif.Data.Tests
             var repo = new FakeRepository<CacheableCat>(_mockCache.Object);
 
             //Assert
-            var baseRepo = repo as RepositoryBase<CacheableCat>;
-            Assert.AreEqual(TestConstants.CACHE_ScopeModule, Util.GetPrivateProperty<RepositoryBase<CacheableCat>, string>(baseRepo, "Scope"));
+            Assert.AreEqual(TestConstants.CACHE_ScopeModule, repo.Scope);
         }
 
         [Test]

@@ -46,11 +46,6 @@ namespace Naif.Data.EntityFramework
             throw new NotImplementedException();
         }
 
-        public ILinqRepository<T> GetLinqRepository<T>() where T : class
-        {
-            return new EFLinqRepository<T>(this, _cache);
-        }
-
         internal NaifDbContext DbContext()
         {
             return _dbContext;

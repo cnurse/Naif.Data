@@ -113,7 +113,6 @@ namespace Naif.Data
             UpdateInternal(item);
             ClearCache(item);
         }
-
         
         private void CheckIfScoped()
         {

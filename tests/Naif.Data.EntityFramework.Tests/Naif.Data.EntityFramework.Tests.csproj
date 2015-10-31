@@ -82,17 +82,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Naif.Data.EntityFramework\Naif.Data.EntityFramework.csproj">
-      <Project>{F031D6E0-AEC7-423E-A6A4-0F1A8A357A80}</Project>
-      <Name>Naif.Data.EntityFramework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Naif.Data\Naif.Data.csproj">
       <Project>{DA9A84CB-368E-489E-97D6-29345F3666BB}</Project>
       <Name>Naif.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Naif.TestUtilities\Naif.TestUtilities.csproj">
-      <Project>{E9E468D8-C526-48C7-AAE2-0CBDB687E840}</Project>
-      <Name>Naif.TestUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

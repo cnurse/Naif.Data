@@ -17,12 +17,12 @@ using Naif.Core.Contracts;
 
 namespace Naif.Data.EntityFramework
 {
-    public class EFLinqRepository<TModel> : LinqRepositoryBase<TModel> where TModel : class
+    public class EFRepository<TModel> : RepositoryBase<TModel> where TModel : class
     {
         private readonly NaifDbContext _context;
         private readonly IDbSet<TModel> _dbSet;
 
-        public EFLinqRepository(IUnitOfWork unitOfWork, ICacheProvider cache) :base(cache)
+        public EFRepository(IUnitOfWork unitOfWork, ICacheProvider cache) :base(cache)
         {
             Requires.NotNull("unitOfWork", unitOfWork);
 
@@ -35,7 +35,17 @@ namespace Naif.Data.EntityFramework
             _dbSet = _context.Set<TModel>();
         }
 
-        public override IQueryable<TModel> Find(Expression<Func<TModel, bool>> predicate)
+        public override IEnumerable<TModel> Find(string sqlCondition, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IPagedList<TModel> Find(int pageIndex, int pageSize, string sqlCondition, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<TModel> Find(Expression<Func<TModel, bool>> predicate)
         {
             return _dbSet.Where(predicate);
         }
@@ -60,12 +70,17 @@ namespace Naif.Data.EntityFramework
             return _dbSet;
         }
 
-        protected override IEnumerable<TModel> GetByScopeInternal<TScopeType>(TScopeType scopeValue)
+        protected override TModel GetByIdInternal(object id)
         {
             throw new NotImplementedException();
         }
 
-        protected override IPagedList<TModel> GetPageByScopeInternal<TScopeType>(TScopeType scopeValue, int pageIndex, int pageSize)
+        protected override IEnumerable<TModel> GetByScopeInternal(object scopeValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IPagedList<TModel> GetPageByScopeInternal(object scopeValue, int pageIndex, int pageSize)
         {
             throw new NotImplementedException();
         }
@@ -78,6 +93,11 @@ namespace Naif.Data.EntityFramework
         protected override void UpdateInternal(TModel item)
         {
             
+        }
+
+        protected override IEnumerable<TModel> GetByPropertyInternal<TProperty>(string propertyName, TProperty propertyValue)
+        {
+            throw new NotImplementedException();
         }
     }
 }
