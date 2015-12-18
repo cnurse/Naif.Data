@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace Naif.Data.EntityFramework.Tests
 {
     [TestFixture]
-    public class EFLinqRepositoryTests
+    public class EFRepositoryTests
     {
         private const string ConnectionStringName = "EntityFramework";
         private readonly string[] _dogAges = TestConstants.EF_DogAges.Split(',');
@@ -42,19 +42,19 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Constructor_Throws_On_Null_DbContext()
+        public void EFRepository_Constructor_Throws_On_Null_DbContext()
         {
             //Arrange, Act, Assert
-            Assert.Throws<ArgumentNullException>(() => new EFLinqRepository<Dog>(null, _cache.Object));
+            Assert.Throws<ArgumentNullException>(() => new EFRepository<Dog>(null, _cache.Object));
         }
 
         [Test]
-        public void EFLinqRepository_Add_Inserts_Item_Into_DataBase()
+        public void EFRepository_Add_Inserts_Item_Into_DataBase()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -71,12 +71,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Add_Inserts_Item_Into_DataBase_With_Correct_ID()
+        public void EFRepository_Add_Inserts_Item_Into_DataBase_With_Correct_ID()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -93,12 +93,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Add_Inserts_Item_Into_DataBase_With_Correct_ColumnValues()
+        public void EFRepository_Add_Inserts_Item_Into_DataBase_With_Correct_ColumnValues()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 Age = TestConstants.EF_InsertDogAge,
@@ -118,12 +118,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Delete_Deletes_Item_From_DataBase()
+        public void EFRepository_Delete_Deletes_Item_From_DataBase()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_DeleteDogId,
@@ -141,12 +141,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Delete_Deletes_Item_From_DataBase_With_Correct_ID()
+        public void EFRepository_Delete_Deletes_Item_From_DataBase_With_Correct_ID()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
             {
                 ID = TestConstants.EF_DeleteDogId,
@@ -167,12 +167,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Delete_Throws_With_Invalid_ID()
+        public void EFRepository_Delete_Throws_With_Invalid_ID()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_InvalidDogId,
@@ -200,12 +200,12 @@ namespace Naif.Data.EntityFramework.Tests
         [Test]
         [TestCase("Spot", 2)]
         [TestCase("Buddy", 1)]
-        public void EFLinqRepository_Find_Returns_List_Of_Models_If_Valid_Property(string dogName, int count)
+        public void EFRepository_Find_Returns_List_Of_Models_If_Valid_Property(string dogName, int count)
         {
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -216,13 +216,13 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Find_Returns_Instance_Of_Model_If_Valid_Property()
+        public void EFRepository_Find_Returns_Instance_Of_Model_If_Valid_Property()
         {
             //Arrange
             SetUpDatabase(5);
             var dogName = _dogNames[2];
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dog = repository.Find((d) => d.Name == dogName).FirstOrDefault();
@@ -232,13 +232,13 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Find_Returns_Empty_List_If_InValid_Proeprty()
+        public void EFRepository_Find_Returns_Empty_List_If_InValid_Proeprty()
         {
             //Arrange
             SetUpDatabase(5);
             const string dogName = "Invalid";
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -251,12 +251,12 @@ namespace Naif.Data.EntityFramework.Tests
         [Test]
         [TestCase("Spot")]
         [TestCase("Buddy")]
-        public void EFLinqRepository_Find_Returns_Models_With_Correct_Properties(string dogName)
+        public void EFRepository_Find_Returns_Models_With_Correct_Properties(string dogName)
         {
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.Find((d) => d.Name == dogName);
@@ -272,12 +272,12 @@ namespace Naif.Data.EntityFramework.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(5)]
-        public void EFLinqRepository_GetAll_Returns_All_Rows(int count)
+        public void EFRepository_GetAll_Returns_All_Rows(int count)
         {
             //Arrange
             SetUpDatabase(count);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             IEnumerable<Dog> dogs = repository.GetAll();
@@ -287,13 +287,13 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_GetAll_Returns_List_Of_Models()
+        public void EFRepository_GetAll_Returns_List_Of_Models()
         {
             //Arrange
             var mockCache = new Mock<ICacheProvider>();
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetAll().ToList();
@@ -306,12 +306,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_GetAll_Returns_Models_With_Correct_Properties()
+        public void EFRepository_GetAll_Returns_Models_With_Correct_Properties()
         {
             //Arrange
             SetUpDatabase(5);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetAll();
@@ -326,12 +326,12 @@ namespace Naif.Data.EntityFramework.Tests
         [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount)]
         [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount)]
         [TestCase(TestConstants.PAGE_Last, TestConstants.PAGE_RecordCount)]
-        public void EFLinqRepository_GetPage_Returns_Page_Of_Rows(int pageIndex, int pageSize)
+        public void EFRepository_GetPage_Returns_Page_Of_Rows(int pageIndex, int pageSize)
         {
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(pageIndex, pageSize);
@@ -341,12 +341,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_GetPage_Returns_List_Of_Models()
+        public void EFRepository_GetPage_Returns_List_Of_Models()
         {
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
@@ -359,12 +359,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_GetPage_Returns_Models_With_Correct_Properties()
+        public void EFRepository_GetPage_Returns_Models_With_Correct_Properties()
         {
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount);
@@ -379,12 +379,12 @@ namespace Naif.Data.EntityFramework.Tests
         [TestCase(TestConstants.PAGE_First, TestConstants.PAGE_RecordCount, 1)]
         [TestCase(TestConstants.PAGE_Second, TestConstants.PAGE_RecordCount, 6)]
         [TestCase(2, 4, 9)]
-        public void EFLinqRepository_GetPage_Returns_Correct_Page(int pageIndex, int pageSize, int firstId)
+        public void EFRepository_GetPage_Returns_Correct_Page(int pageIndex, int pageSize, int firstId)
         {
             //Arrange
             SetUpDatabase(TestConstants.PAGE_TotalCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
             //Act
             var dogs = repository.GetPage(pageIndex, pageSize);
@@ -396,12 +396,12 @@ namespace Naif.Data.EntityFramework.Tests
 
 
         //[Test]
-        //public void EFLinqRepository_GetSingle_Returns_Instance_Of_Model_If_Valid_Id()
+        //public void EFRepository_GetSingle_Returns_Instance_Of_Model_If_Valid_Id()
         //{
         //    //Arrange
         //    SetUpDatabase(5);
 
-        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+        //    var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
         //    //Act
         //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
@@ -411,13 +411,13 @@ namespace Naif.Data.EntityFramework.Tests
         //}
 
         //[Test]
-        //public void EFLinqRepository_GetSingle_Returns_Null_If_InValid_Id()
+        //public void EFRepository_GetSingle_Returns_Null_If_InValid_Id()
         //{
         //    //Arrange
         //    var mockCache = new Mock<ICacheProvider>();
         //    SetUpDatabase(5);
 
-        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+        //    var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
         //    //Act
         //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_InvalidDogId);
@@ -427,13 +427,13 @@ namespace Naif.Data.EntityFramework.Tests
         //}
 
         //[Test]
-        //public void EFLinqRepository_GetSingle_Returns_Model_With_Correct_Properties()
+        //public void EFRepository_GetSingle_Returns_Model_With_Correct_Properties()
         //{
         //    //Arrange
         //    var mockCache = new Mock<ICacheProvider>();
         //    SetUpDatabase(5);
 
-        //    var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+        //    var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
 
         //    //Act
         //    var dog = repository.GetSingle((d) => d.ID == TestConstants.EF_ValidDogId);
@@ -444,12 +444,12 @@ namespace Naif.Data.EntityFramework.Tests
         //}
 
         [Test]
-        public void EFLinqRepository_Update_Updates_Item_In_DataBase()
+        public void EFRepository_Update_Updates_Item_In_DataBase()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_UpdateDogId,
@@ -467,12 +467,12 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFLinqRepository_Update_Updates_Item_With_Correct_ID()
+        public void EFRepository_Update_Updates_Item_With_Correct_ID()
         {
             //Arrange
             SetUpDatabase(TestConstants.EF_RecordCount);
 
-            var repository = new EFLinqRepository<Dog>(_efUnitOfWork, _cache.Object);
+            var repository = new EFRepository<Dog>(_efUnitOfWork, _cache.Object);
             var dog = new Dog
                             {
                                 ID = TestConstants.EF_UpdateDogId,

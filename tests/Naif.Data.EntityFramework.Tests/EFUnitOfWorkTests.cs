@@ -68,26 +68,16 @@ namespace Naif.Data.EntityFramework.Tests
         }
 
         [Test]
-        public void EFUnitOfWork_GetLinqRepository_Returns_Repository()
+        public void EFUnitOfWork_GetRepository_Returns_Repository()
         {
             //Arrange, Act
             var context = new EFUnitOfWork(ConnectionStringName, null, _cache.Object);
 
             //Act
-            var rep = context.GetLinqRepository<Dog>();
+            var rep = context.GetRepository<Dog>();
 
             //Assert
-            Assert.IsInstanceOf<ILinqRepository<Dog>>(rep);
-        }
-
-        [Test]
-        public void EFUnitOfWork_GetRepository_Throwsy()
-        {
-            //Arrange, Act
-            var context = new EFUnitOfWork(ConnectionStringName, null, _cache.Object);
-
-            //Act, Assert
-            Assert.Throws<NotImplementedException>(() => context.GetRepository<Dog>());
+            Assert.IsInstanceOf<IRepository<Dog>>(rep);
         }
 
         [Test]
