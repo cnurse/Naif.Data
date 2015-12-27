@@ -6,11 +6,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8EF28436-3C5C-4E82-A753-A4AF0E706B9D}</ProjectGuid>
+    <ProjectGuid>{E9E468D8-C526-48C7-AAE2-0CBDB687E840}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Naif.Data.NPoco.Tests</RootNamespace>
-    <AssemblyName>Naif.Data.NPoco.Tests</AssemblyName>
+    <RootNamespace>Naif.TestUtilities</RootNamespace>
+    <AssemblyName>Naif.TestUtilities</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -36,28 +36,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Naif\src\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Naif.Core, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Naif.Core.1.4.0\lib\Naif.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NPoco, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Naif\src\packages\NPoco.2.10.11\lib\net45\NPoco.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Naif\src\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -66,28 +50,40 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NPocoUnitOfWorkTests.cs" />
-    <Compile Include="NPocoRepositoryTests.cs" />
+    <Compile Include="DataResources.Designer.cs">
+      <DependentUpon>DataResources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="DataUtil.cs" />
+    <Compile Include="Fakes\FakeRepository.cs" />
+    <Compile Include="Models\CacheableCat.cs" />
+    <Compile Include="Models\CacheableDog.cs" />
+    <Compile Include="Models\Cat.cs" />
+    <Compile Include="Models\Dog.cs" />
+    <Compile Include="Models\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestConstants.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\App.config">
-      <Link>App.config</Link>
-    </None>
+    <EmbeddedResource Include="DataResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DataResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Naif.Data.NPoco\Naif.Data.NPoco.csproj">
-      <Project>{C2C6E08C-AD63-40BE-BE8A-3FE52A2CC64A}</Project>
-      <Name>Naif.Data.NPoco</Name>
+    <ProjectReference Include="..\..\..\Naif.Core\src\Naif.Core\Naif.Core.csproj">
+      <Project>{92d29735-f300-4640-887c-b7ed827a1154}</Project>
+      <Name>Naif.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Naif.Data\Naif.Data.csproj">
-      <Project>{DA9A84CB-368E-489E-97D6-29345F3666BB}</Project>
+    <ProjectReference Include="..\..\..\Naif.Data\src\Naif.Data\Naif.Data.csproj">
+      <Project>{da9a84cb-368e-489e-97d6-29345f3666bb}</Project>
       <Name>Naif.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Naif.TestUtilities\Naif.TestUtilities.csproj">
-      <Project>{e9e468d8-c526-48c7-aae2-0cbdb687e840}</Project>
-      <Name>Naif.TestUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -46,6 +46,10 @@
       <HintPath>..\..\..\Naif\src\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Naif.Core, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Naif.Core.1.4.0\lib\Naif.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\..\..\Naif\src\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -77,10 +81,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Naif.Core\src\Naif.Core\Naif.Core.csproj">
-      <Project>{92d29735-f300-4640-887c-b7ed827a1154}</Project>
-      <Name>Naif.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Naif\tests\Naif.TestUtilities\Naif.TestUtilities.csproj">
       <Project>{e9e468d8-c526-48c7-aae2-0cbdb687e840}</Project>
       <Name>Naif.TestUtilities</Name>
